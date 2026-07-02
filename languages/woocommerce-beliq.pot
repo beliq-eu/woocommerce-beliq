@@ -13,9 +13,6 @@ msgstr ""
 msgid "A compliant e-invoice is stored for this order."
 msgstr ""
 
-msgid "API base URL"
-msgstr ""
-
 msgid "API key"
 msgstr ""
 
