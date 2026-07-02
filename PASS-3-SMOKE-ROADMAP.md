@@ -96,16 +96,48 @@ Done in-repo:
 - Plugin header `WC tested up to` bumped to `10.9` (the smoke ran WooCommerce
   10.9.1).
 
-Operator steps that remain:
-1. Copy `tmp/screenshot-1.png` and `tmp/screenshot-2.png` into the wp.org SVN
-   `/assets` directory (not `trunk`).
-2. Bump `Tested up to` (WP) in `readme.txt` to the WordPress version the store
-   reports (Dashboard > Updates, or the store footer). The smoke ran WordPress
-   latest on an unpinned image, so the exact number has to be read off the store;
-   it is not knowable from the repo.
-3. Flip `CHANGELOG.md` `0.1.0 (unreleased)` to the release date at tag time.
-4. Submit to the plugin directory for review, then on approval SVN-commit `trunk`
-   + tag `0.1.0` and set the wp.org `Stable tag`.
+#### Remaining operator steps
+
+The publish itself waits for the **public beliq go-live**. The plugin does nothing
+without a reachable `api.beliq.eu` and a working free tier: the wp.org reviewer
+tests functionality, and the readme promises "the free tier is enough to evaluate
+the plugin." Shipping before the production API and signup are live would fail
+review or land users on a dead endpoint. So the SVN publish is a post-go-live step.
+
+Can be done any time before go-live:
+- Merge the in-repo prep (this pass).
+- Register a WordPress.org account for the submitter, if there isn't one.
+
+At/after beliq go-live, in order:
+
+1. **Confirm the live path.** Ensure production `https://api.beliq.eu` is live and
+   free-tier signup works. Mint a real free-tier key and run one manual generate
+   (or the `smoke/` harness pointed at production) so the reviewer's path is
+   known-good. This is the deferred live-key smoke.
+2. **Finalize version metadata in `readme.txt`.**
+   - `Tested up to`: set to the current WordPress version (Dashboard > Updates).
+     It sits at `6.7`; bump to the version WordPress is actually on at submission.
+   - `WC tested up to` in `woocommerce-beliq.php` is `10.9`; nudge it if WooCommerce
+     has moved on by then.
+   - Flip `CHANGELOG.md` `0.1.0 (unreleased)` to the release date.
+   - Keep `Stable tag: 0.1.0` matching the plugin header `Version`.
+3. **Build the submission zip** (plugin runtime only, self-contained autoloader, no
+   Composer install needed):
+   - Include: `woocommerce-beliq.php`, `src/`, `languages/`, `readme.txt`, `LICENSE`.
+   - Exclude: `tests/`, `smoke/`, `tmp/`, `.github/`, `phpunit.xml`, `phpcs.xml`,
+     `composer.json`/`composer.lock`, `ROADMAP.md`, `PASS-3-SMOKE-ROADMAP.md`,
+     `.git/`, `vendor/`.
+4. **Submit for review** via the current wp.org Plugin Developer Handbook flow
+   (upload the zip at the "Add your plugin" page). Wait for the review email; a
+   human checks the code and the external-service disclosure.
+5. **On approval, SVN publish.** Check out the assigned repo
+   (`https://plugins.svn.wordpress.org/woocommerce-beliq/`):
+   - Put the plugin files in `/trunk`.
+   - Put `screenshot-1.png` + `screenshot-2.png` (from `tmp/`) in `/assets`, plus an
+     icon/banner if desired. Assets live in `/assets`, never in `/trunk`.
+   - `svn copy trunk tags/0.1.0`, confirm `Stable tag: 0.1.0`, then `svn commit`.
+6. **Verify the live listing.** Screenshots and description render; a fresh install
+   against production `api.beliq.eu` generates a green invoice end to end.
 
 ## Decisions
 
