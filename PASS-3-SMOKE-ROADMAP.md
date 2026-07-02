@@ -79,24 +79,33 @@ Cases: German XRechnung (xml), French Peppol BIS (xml), German ZUGFeRD (hybrid p
 
 ### 3.3 - WordPress.org submission (OPERATOR-GATED)
 
-Prep verified in this pass; the actual SVN commit + review is the operator's.
+The `readme.txt`, screenshots, and version metadata are prepared in-repo; the
+actual SVN commit + review is the operator's (needs a wp.org account).
 
-Ready:
-- `readme.txt` is wp.org-valid and its `Stable tag: 0.1.0` matches the plugin
-  header `Version: 0.1.0`. `Requires at least 6.4`, `Requires PHP 8.2`.
+Done in-repo:
+- `readme.txt` is wp.org-valid, its `Stable tag: 0.1.0` matches the plugin header
+  `Version: 0.1.0`, and it carries the external-services disclosure. `Requires at
+  least 6.4`, `Requires PHP 8.2`.
+- The two submission screenshots are captured and named to the wp.org convention
+  in `tmp/`: `screenshot-1.png` (the Integrations settings screen, API key masked,
+  no editable API base URL) and `screenshot-2.png` (the order "beliq e-invoice"
+  box, highlighted, with Download + Regenerate). `tmp/` is untracked and must not
+  be committed; the PNGs go to SVN `/assets`, not the plugin tree.
+- `readme.txt` has a `== Screenshots ==` section whose two captions match that
+  file order.
+- Plugin header `WC tested up to` bumped to `10.9` (the smoke ran WooCommerce
+  10.9.1).
 
-Operator checklist (needs the running store + a live/staging beliq API):
-1. Capture screenshots from the running smoke store (`smoke/run.sh` leaves it at
-   http://localhost:8091, admin/admin): the Integrations settings screen
-   (`WooCommerce > Settings > Integrations > beliq e-invoicing`) and the order
-   "beliq e-invoice" metabox with the Download button. Add a `== Screenshots ==`
-   section to `readme.txt` and place `screenshot-1.png` etc. under the wp.org
-   `assets/` (SVN `/assets`, not the plugin tree).
-2. Flip `CHANGELOG.md` `0.1.0 (unreleased)` to a release date; consider bumping
-   `Tested up to` (WP) and `WC tested up to` (currently 9.4; the smoke ran on
-   WooCommerce 10.9.1).
-3. Submit to the plugin directory for review, then on approval SVN-commit
-   `trunk` + tag `0.1.0` and set the wp.org `Stable tag`.
+Operator steps that remain:
+1. Copy `tmp/screenshot-1.png` and `tmp/screenshot-2.png` into the wp.org SVN
+   `/assets` directory (not `trunk`).
+2. Bump `Tested up to` (WP) in `readme.txt` to the WordPress version the store
+   reports (Dashboard > Updates, or the store footer). The smoke ran WordPress
+   latest on an unpinned image, so the exact number has to be read off the store;
+   it is not knowable from the repo.
+3. Flip `CHANGELOG.md` `0.1.0 (unreleased)` to the release date at tag time.
+4. Submit to the plugin directory for review, then on approval SVN-commit `trunk`
+   + tag `0.1.0` and set the wp.org `Stable tag`.
 
 ## Decisions
 
