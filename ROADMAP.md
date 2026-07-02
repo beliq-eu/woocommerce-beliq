@@ -123,6 +123,15 @@ that the admin download works. Add a German XRechnung and a non-German Peppol BI
 live case. Then the operator-gated WordPress.org submission (screenshots, stable
 tag, review).
 
+The smoke is DONE and green: a committed, reproducible harness under `smoke/`
+(MariaDB + WordPress + WooCommerce + the plugin, reaching a host beliq api/engine
+via `host.docker.internal`) runs 38/38 checks across German XRechnung, French
+Peppol BIS, and German ZUGFeRD (hybrid PDF), plus the business-only skip,
+idempotency, and the download capability gate. HPOS meta round-trip is verified
+against the `wc_orders_meta` table; the admin download is verified end to end with
+a real authenticated HTTP request. See `PASS-3-SMOKE-ROADMAP.md` and `smoke/README.md`.
+The WordPress.org submission stays operator-gated (screenshots + SVN + review).
+
 ## Operator-gated (post-go-live)
 
 - WordPress.org plugin directory submission and manual review, and/or a Packagist

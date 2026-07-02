@@ -1,0 +1,75 @@
+# Local WordPress + WooCommerce stack for the Pass 3 live smoke.
+#
+# It runs the store; the beliq api (:3000) and engine (:8000) run on the host
+# (see README.md) and are reached from the containers via host.docker.internal.
+# The plugin is bind-mounted read-only from the repo root; the store writes only
+# to wp-content/uploads, so read-only is fine.
+#
+# wpcli shares the WordPress files volume with the web container and runs as the
+# same uid (33 = the debian www-data apache runs as) so files it writes stay
+# readable by apache.
+name: beliq-woocommerce-smoke
+
+services:
+  db:
+    image: mariadb:11
+    environment:
+      MARIADB_DATABASE: wordpress
+      MARIADB_USER: wordpress
+      MARIADB_PASSWORD: wordpress
+      MARIADB_ROOT_PASSWORD: root
+    volumes:
+      - db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  wordpress:
+    image: wordpress:php8.3-apache
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8091:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - wp:/var/www/html
+      - ..:/var/www/html/wp-content/plugins/woocommerce-beliq:ro
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:80/"]
+      interval: 5s
+      timeout: 5s
+      retries: 40
+
+  wpcli:
+    image: wordpress:cli-php8.3
+    user: "33:33"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+      BELIQ_API_KEY: ${BELIQ_API_KEY:-}
+      BELIQ_BASE_URL: ${BELIQ_BASE_URL:-http://host.docker.internal:3000}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - wp:/var/www/html
+      - ..:/var/www/html/wp-content/plugins/woocommerce-beliq:ro
+      - ./:/smoke:ro
+    entrypoint: ["tail", "-f", "/dev/null"]
+
+volumes:
+  db:
+  wp:
