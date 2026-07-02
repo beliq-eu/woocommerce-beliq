@@ -74,28 +74,44 @@ Verified locally by driving the ported core and the adapter through the bootstra
 autoloader (this box's CLI PHP lacks the dom/xml/mbstring extensions PHPUnit 11
 needs, so PHPUnit itself runs in CI). No WordPress is needed to build or test.
 
-### Pass 2: WooCommerce runtime wiring
+### Pass 2: WooCommerce runtime wiring (done)
 
-- Plugin bootstrap file with the WordPress header (`Requires Plugins: woocommerce`,
-  WC version headers) and the HPOS `custom_order_tables` compatibility declaration.
+- `woocommerce-beliq.php`: plugin bootstrap with the WordPress header
+  (`Requires Plugins: woocommerce`, WC version headers), a self-contained PSR-4
+  autoloader, the HPOS `custom_order_tables` compatibility declaration, and a
+  WooCommerce-missing admin notice.
+- `Plugin`: wires the integration, the status trigger, and the admin surfaces
+  once WooCommerce is loaded.
 - `WcOrderData` / `WcLineData`: the `OrderData` / `LineData` wrappers over a real
-  `WC_Order` (line net from `get_total()`, rate from `WC_Tax`, buyer VAT / reference
-  from the configured order meta keys, all through the order CRUD API for HPOS).
+  `WC_Order` (line net from `get_total()`, dominant rate from `WC_Tax`, buyer VAT /
+  reference from the configured order meta keys, all through the order CRUD API for
+  HPOS).
 - `InvoiceIntegration` (a `WC_Integration`): the settings screen for the beliq
   connection, seller legal details, payment means, and generation options, plus
   the two WooCommerce-only meta-key settings (buyer VAT, buyer reference).
 - `WooPluginConfigProvider`: reads the stored settings, normalizes the `yes`/`no`
-  checkbox values, and calls `PluginConfig::fromValues`.
-- `OrderStatusTrigger`: fires on the configured order status (`processing` or
-  `completed`), never throws out of the handler (a generation failure must not
-  break checkout), logs through `wc_get_logger()`.
+  checkbox values, and calls `PluginConfig::fromValues`; the coercion is unit-tested
+  through the static `fromRawSettings()` seam.
+- `OrderStatusTrigger`: fires on `woocommerce_order_status_changed`, runs only on
+  the configured status, and never throws out of the handler (a generation failure
+  must not break the transition), logging through `wc_get_logger()`.
 - `InvoiceGenerator` + `DocumentStore`: generate through the beliq client, store the
-  bytes in a protected uploads directory, record the path in order meta, serve
-  downloads through a capability-checked PHP endpoint.
-- Admin metabox + `woocommerce_order_actions` (re)generate with regeneration
-  idempotency.
-- i18n text domain and a WordPress.org `readme.txt`; PHPCS (WordPress standards)
-  added to CI.
+  bytes in a protected uploads directory (with a deny rule), record the location in
+  order meta, and serve downloads through a capability-checked, nonce-verified,
+  path-validated endpoint.
+- `OrderMetabox` + `OrderActions`: the order-screen box with status and download,
+  a manual (re)generate posted to `admin-post.php`, and the native
+  `woocommerce_order_actions` entry; the automatic trigger is idempotent (it does
+  not overwrite), a manual regenerate forces a rebuild.
+- Two new `PluginConfig` fields (`buyerVatMetaKey`, `buyerReferenceMetaKey`); i18n
+  text domain `woocommerce-beliq` with a `languages/woocommerce-beliq.pot` template
+  and a WordPress.org `readme.txt`; a PHPCS ruleset running the WordPress security
+  and i18n sniffs over the runtime code, added to CI as a separate job.
+
+Verified offline the same way as Pass 1 (this box's CLI PHP has no dom/mbstring, so
+PHPUnit and PHPCS run in CI): every file lints clean with `php -l`, and the new
+`WooPluginConfigProviderTest` covers the checkbox coercion and the meta-key mapping
+against plain arrays. The runtime classes are never autoloaded by the offline suite.
 
 ### Pass 3: live smoke + store submission
 

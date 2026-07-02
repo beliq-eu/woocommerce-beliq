@@ -13,7 +13,9 @@ use Beliq\Core\Invoice\SourceOrder;
  * VAT/tax ids, and the BG-6 contact); the seller's bank details become the
  * paymentMeans template. profile is null when the merchant leaves it blank,
  * letting the engine pick its default. triggerEvent holds the WooCommerce order
- * status that generation runs on.
+ * status that generation runs on. buyerVatMetaKey and buyerReferenceMetaKey name
+ * the order meta fields the WC_Order wrapper reads the buyer VAT id and buyer
+ * reference from; both are empty when the merchant has not mapped them.
  */
 final readonly class PluginConfig
 {
@@ -49,6 +51,8 @@ final readonly class PluginConfig
         public string $zeroRateCategory,
         public Party $seller,
         public ?PaymentMeans $paymentMeans = null,
+        public string $buyerVatMetaKey = '',
+        public string $buyerReferenceMetaKey = '',
     ) {
     }
 
@@ -130,6 +134,8 @@ final readonly class PluginConfig
             zeroRateCategory: $str('zeroRateCategory', self::DEFAULT_ZERO_RATE_CATEGORY),
             seller: $seller,
             paymentMeans: $paymentMeans,
+            buyerVatMetaKey: $str('buyerVatMetaKey'),
+            buyerReferenceMetaKey: $str('buyerReferenceMetaKey'),
         );
     }
 
