@@ -1,0 +1,246 @@
+# Copyright (C) 2026 beliq
+# This file is distributed under the MIT license.
+msgid ""
+msgstr ""
+"Project-Id-Version: beliq e-invoicing 0.1.0\n"
+"Report-Msgid-Bugs-To: https://beliq.eu\n"
+"Language-Team: beliq <hello@beliq.eu>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: woocommerce-beliq\n"
+
+msgid "A compliant e-invoice is stored for this order."
+msgstr ""
+
+msgid "API base URL"
+msgstr ""
+
+msgid "API key"
+msgstr ""
+
+msgid "Also used as the seller electronic address (BT-34). XRechnung requires it (BR-DE-7)."
+msgstr ""
+
+msgid "Applies to the ZUGFeRD / Factur-X family. XRechnung and Peppol BIS pin their own profile."
+msgstr ""
+
+msgid "Automatic generation"
+msgstr ""
+
+msgid "BIC"
+msgstr ""
+
+msgid "Bank name"
+msgstr ""
+
+msgid "Basic WL"
+msgstr ""
+
+msgid "Buyer VAT ID meta key"
+msgstr ""
+
+msgid "Buyer reference meta key"
+msgstr ""
+
+msgid "City"
+msgstr ""
+
+msgid "Company registration number"
+msgstr ""
+
+msgid "Contact e-mail"
+msgstr ""
+
+msgid "Contact person"
+msgstr ""
+
+msgid "Contact phone"
+msgstr ""
+
+msgid "Country code (2 letters)"
+msgstr ""
+
+msgid "Credit transfer"
+msgstr ""
+
+msgid "Document format"
+msgstr ""
+
+msgid "Download"
+msgstr ""
+
+msgid "E - Exempt"
+msgstr ""
+
+msgid "EN 16931 (comfort)"
+msgstr ""
+
+msgid "Extended"
+msgstr ""
+
+msgid "Factur-X (hybrid PDF)"
+msgstr ""
+
+msgid "G - Export outside the EU"
+msgstr ""
+
+msgid "Generate beliq e-invoice"
+msgstr ""
+
+msgid "Generate compliant EN 16931 e-invoices (XRechnung, ZUGFeRD, Factur-X, Peppol BIS) from your orders through the beliq API. beliq generates and validates the document; sending, archiving, and filing stay with you."
+msgstr ""
+
+msgid "Generate invoices automatically"
+msgstr ""
+
+msgid "Generate now"
+msgstr ""
+
+msgid "Generate only when the buyer looks like a business (VAT ID or company). Turn off to generate for every order."
+msgstr ""
+
+msgid "Generate when"
+msgstr ""
+
+#. translators: %s is a value substituted at runtime.
+msgid "Generated %s"
+msgstr ""
+
+msgid "How the buyer pays (BG-16). An IBAN is required for either option; XRechnung rejects a SEPA credit transfer without one (BR-DE-23-a)."
+msgstr ""
+
+msgid "IBAN"
+msgstr ""
+
+msgid "If another plugin stores the buyer VAT ID or a buyer reference (for example a Leitweg-ID) in order meta, name the meta keys here to carry them onto the invoice."
+msgstr ""
+
+msgid "Invoice generation"
+msgstr ""
+
+msgid "Legal name"
+msgstr ""
+
+msgid "No beliq e-invoice was generated: this order is outside the configured scope."
+msgstr ""
+
+msgid "No document is stored for this order."
+msgstr ""
+
+msgid "No e-invoice has been generated for this order yet."
+msgstr ""
+
+msgid "Only generate for business orders"
+msgstr ""
+
+msgid "Order field mapping"
+msgstr ""
+
+msgid "Order is completed"
+msgstr ""
+
+msgid "Order not found."
+msgstr ""
+
+msgid "Output"
+msgstr ""
+
+msgid "PDF (hybrid, where the format supports it)"
+msgstr ""
+
+msgid "Payment details"
+msgstr ""
+
+msgid "Payment means"
+msgstr ""
+
+msgid "Payment received (order is processing)"
+msgstr ""
+
+msgid "Peppol BIS Billing (XML)"
+msgstr ""
+
+msgid "Postal code"
+msgstr ""
+
+msgid "Profile"
+msgstr ""
+
+msgid "Regenerate"
+msgstr ""
+
+msgid "SEPA credit transfer"
+msgstr ""
+
+msgid "Scope"
+msgstr ""
+
+msgid "Seller contact name (BG-6 / BT-41). Required by XRechnung (BR-DE-5)."
+msgstr ""
+
+msgid "Seller contact telephone (BT-42). Required by XRechnung (BR-DE-6)."
+msgstr ""
+
+msgid "Seller details"
+msgstr ""
+
+msgid "Street and number"
+msgstr ""
+
+msgid "Tax number"
+msgstr ""
+
+msgid "The account the buyer pays into. Leave the payment fields empty to omit payment details."
+msgstr ""
+
+msgid "The buyer reference (BT-10). Falls back to a customer reference, then the order number, when empty."
+msgstr ""
+
+msgid "The tax treatment for zero-rated lines is your call. Reverse charge and intra-community supply are not auto-detected."
+msgstr ""
+
+msgid "VAT ID"
+msgstr ""
+
+msgid "VAT category for 0% lines"
+msgstr ""
+
+msgid "XML only"
+msgstr ""
+
+msgid "XRechnung (XML)"
+msgstr ""
+
+msgid "You are not allowed to download this document."
+msgstr ""
+
+msgid "You are not allowed to generate this document."
+msgstr ""
+
+msgid "Your beliq API key. The free tier is enough to evaluate the plugin."
+msgstr ""
+
+msgid "Z - Zero rated"
+msgstr ""
+
+msgid "ZUGFeRD / Factur-X (hybrid PDF)"
+msgstr ""
+
+msgid "beliq connection"
+msgstr ""
+
+msgid "beliq e-invoice"
+msgstr ""
+
+msgid "beliq e-invoice generated."
+msgstr ""
+
+msgid "beliq e-invoice generation failed. See WooCommerce > Status > Logs (source: beliq)."
+msgstr ""
+
+msgid "beliq e-invoicing"
+msgstr ""
+
+msgid "beliq e-invoicing requires WooCommerce to be installed and active."
+msgstr ""

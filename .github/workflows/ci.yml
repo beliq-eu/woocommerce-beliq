@@ -24,3 +24,17 @@ jobs:
         run: composer test
       - name: Scrub check (no em-dash)
         run: composer scrub:check
+
+  phpcs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: curl, json
+          coverage: none
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress
+      - name: WordPress coding standards (security + i18n)
+        run: composer phpcs
