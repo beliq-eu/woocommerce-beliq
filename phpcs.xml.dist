@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<ruleset name="woocommerce-beliq">
+    <description>
+        WordPress security and internationalization sniffs for the runtime plugin
+        code. Formatting is kept consistent by hand in the shared modern
+        (namespaced, strict-typed) PHP style the whole beliq PHP portfolio uses,
+        which the full WordPress-Core formatting standard is not written for, so
+        this ruleset enforces the WordPress sniffs that actually matter for a
+        store plugin: output escaping, input sanitization, nonce verification,
+        and text-domain consistency. The framework-agnostic core under src/Core
+        is covered by its own unit tests and excluded here.
+    </description>
+
+    <file>woocommerce-beliq.php</file>
+    <file>src</file>
+
+    <exclude-pattern>*/src/Core/*</exclude-pattern>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/tests/*</exclude-pattern>
+
+    <arg name="extensions" value="php"/>
+    <arg name="basepath" value="."/>
+    <arg name="colors"/>
+    <arg value="ps"/>
+
+    <config name="minimum_wp_version" value="6.4"/>
+
+    <rule ref="WordPress.Security.EscapeOutput"/>
+    <rule ref="WordPress.Security.NonceVerification"/>
+    <rule ref="WordPress.Security.ValidatedSanitizedInput"/>
+
+    <rule ref="WordPress.WP.I18n">
+        <properties>
+            <property name="text_domain" type="array">
+                <element value="woocommerce-beliq"/>
+            </property>
+        </properties>
+    </rule>
+</ruleset>
