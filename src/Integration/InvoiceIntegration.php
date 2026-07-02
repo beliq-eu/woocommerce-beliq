@@ -44,11 +44,6 @@ class InvoiceIntegration extends WC_Integration
                 'description' => __('Your beliq API key. The free tier is enough to evaluate the plugin.', 'woocommerce-beliq'),
                 'default' => '',
             ],
-            'baseUrl' => [
-                'title' => __('API base URL', 'woocommerce-beliq'),
-                'type' => 'text',
-                'default' => 'https://api.beliq.eu',
-            ],
 
             'seller_title' => [
                 'title' => __('Seller details', 'woocommerce-beliq'),

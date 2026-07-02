@@ -33,6 +33,14 @@ Features:
 
 A beliq API key is required. The free tier is enough to evaluate the plugin.
 
+== External services ==
+
+This plugin connects to the beliq API at https://api.beliq.eu, a third-party service operated by beliq, to generate and validate your e-invoices. The plugin cannot produce a compliant document without it.
+
+When an invoice is generated (automatically when an order reaches the status you configure, or manually from the order screen), the plugin sends that order's invoice data to the beliq API: the seller details you configure, the buyer's billing details and VAT ID, the order line items, and the amounts and taxes. The request is authenticated with your beliq API key. beliq returns the generated document, which the plugin stores with the order. No data is sent to beliq at any other time, and nothing is sent to any other service.
+
+For how beliq handles this data, see the beliq Terms of Service at https://beliq.eu/legal/terms-of-service/ and the Privacy Policy at https://beliq.eu/legal/privacy-policy/.
+
 == Installation ==
 
 1. Install and activate WooCommerce.
