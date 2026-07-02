@@ -124,7 +124,7 @@ final class DocumentStore
     {
         $uploads = wp_upload_dir();
         if (!empty($uploads['error'])) {
-            throw new RuntimeException('WordPress uploads directory is not writable: ' . $uploads['error']);
+            throw new RuntimeException('WordPress uploads directory is not available for writing the generated invoice.');
         }
 
         $dir = $this->dir();
