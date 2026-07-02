@@ -79,24 +79,65 @@ Cases: German XRechnung (xml), French Peppol BIS (xml), German ZUGFeRD (hybrid p
 
 ### 3.3 - WordPress.org submission (OPERATOR-GATED)
 
-Prep verified in this pass; the actual SVN commit + review is the operator's.
+The `readme.txt`, screenshots, and version metadata are prepared in-repo; the
+actual SVN commit + review is the operator's (needs a wp.org account).
 
-Ready:
-- `readme.txt` is wp.org-valid and its `Stable tag: 0.1.0` matches the plugin
-  header `Version: 0.1.0`. `Requires at least 6.4`, `Requires PHP 8.2`.
+Done in-repo:
+- `readme.txt` is wp.org-valid, its `Stable tag: 0.1.0` matches the plugin header
+  `Version: 0.1.0`, and it carries the external-services disclosure. `Requires at
+  least 6.4`, `Requires PHP 8.2`.
+- The two submission screenshots are captured and named to the wp.org convention
+  in `tmp/`: `screenshot-1.png` (the Integrations settings screen, API key masked,
+  no editable API base URL) and `screenshot-2.png` (the order "beliq e-invoice"
+  box, highlighted, with Download + Regenerate). `tmp/` is untracked and must not
+  be committed; the PNGs go to SVN `/assets`, not the plugin tree.
+- `readme.txt` has a `== Screenshots ==` section whose two captions match that
+  file order.
+- Plugin header `WC tested up to` bumped to `10.9` (the smoke ran WooCommerce
+  10.9.1).
 
-Operator checklist (needs the running store + a live/staging beliq API):
-1. Capture screenshots from the running smoke store (`smoke/run.sh` leaves it at
-   http://localhost:8091, admin/admin): the Integrations settings screen
-   (`WooCommerce > Settings > Integrations > beliq e-invoicing`) and the order
-   "beliq e-invoice" metabox with the Download button. Add a `== Screenshots ==`
-   section to `readme.txt` and place `screenshot-1.png` etc. under the wp.org
-   `assets/` (SVN `/assets`, not the plugin tree).
-2. Flip `CHANGELOG.md` `0.1.0 (unreleased)` to a release date; consider bumping
-   `Tested up to` (WP) and `WC tested up to` (currently 9.4; the smoke ran on
-   WooCommerce 10.9.1).
-3. Submit to the plugin directory for review, then on approval SVN-commit
-   `trunk` + tag `0.1.0` and set the wp.org `Stable tag`.
+#### Remaining operator steps
+
+The publish itself waits for the **public beliq go-live**. The plugin does nothing
+without a reachable `api.beliq.eu` and a working free tier: the wp.org reviewer
+tests functionality, and the readme promises "the free tier is enough to evaluate
+the plugin." Shipping before the production API and signup are live would fail
+review or land users on a dead endpoint. So the SVN publish is a post-go-live step.
+
+Can be done any time before go-live:
+- Merge the in-repo prep (this pass).
+- Register a WordPress.org account for the submitter, if there isn't one.
+
+At/after beliq go-live, in order:
+
+1. **Confirm the live path.** Ensure production `https://api.beliq.eu` is live and
+   free-tier signup works. Mint a real free-tier key and run one manual generate
+   (or the `smoke/` harness pointed at production) so the reviewer's path is
+   known-good. This is the deferred live-key smoke.
+2. **Finalize version metadata in `readme.txt`.**
+   - `Tested up to`: set to the current WordPress version (Dashboard > Updates).
+     It sits at `6.7`; bump to the version WordPress is actually on at submission.
+   - `WC tested up to` in `woocommerce-beliq.php` is `10.9`; nudge it if WooCommerce
+     has moved on by then.
+   - Flip `CHANGELOG.md` `0.1.0 (unreleased)` to the release date.
+   - Keep `Stable tag: 0.1.0` matching the plugin header `Version`.
+3. **Build the submission zip** (plugin runtime only, self-contained autoloader, no
+   Composer install needed):
+   - Include: `woocommerce-beliq.php`, `src/`, `languages/`, `readme.txt`, `LICENSE`.
+   - Exclude: `tests/`, `smoke/`, `tmp/`, `.github/`, `phpunit.xml`, `phpcs.xml`,
+     `composer.json`/`composer.lock`, `ROADMAP.md`, `PASS-3-SMOKE-ROADMAP.md`,
+     `.git/`, `vendor/`.
+4. **Submit for review** via the current wp.org Plugin Developer Handbook flow
+   (upload the zip at the "Add your plugin" page). Wait for the review email; a
+   human checks the code and the external-service disclosure.
+5. **On approval, SVN publish.** Check out the assigned repo
+   (`https://plugins.svn.wordpress.org/woocommerce-beliq/`):
+   - Put the plugin files in `/trunk`.
+   - Put `screenshot-1.png` + `screenshot-2.png` (from `tmp/`) in `/assets`, plus an
+     icon/banner if desired. Assets live in `/assets`, never in `/trunk`.
+   - `svn copy trunk tags/0.1.0`, confirm `Stable tag: 0.1.0`, then `svn commit`.
+6. **Verify the live listing.** Screenshots and description render; a fresh install
+   against production `api.beliq.eu` generates a green invoice end to end.
 
 ## Decisions
 

@@ -67,6 +67,11 @@ By default, only orders that look like a business purchase (a VAT ID or a compan
 
 In a protected subdirectory of your WordPress uploads folder. It is served only through a capability-checked download on the order screen, never linked publicly.
 
+== Screenshots ==
+
+1. The beliq integration settings under WooCommerce > Settings > Integrations: the API key, seller legal details, payment account, and invoice generation options.
+2. The beliq e-invoice box on the order screen (highlighted), showing the generation status and a capability-checked download.
+
 == Changelog ==
 
 = 0.1.0 =
