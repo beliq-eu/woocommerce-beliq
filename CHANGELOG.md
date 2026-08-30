@@ -2,6 +2,7 @@
 
 ## 0.1.0 (unreleased)
 
+- The Output setting resolves to XML on XRechnung and Peppol BIS. Neither has a hybrid PDF, so the API answered `output=pdf` for them with a 400 on every order. The setting's own label ("PDF (hybrid, where the format supports it)") already said this is what it means.
 - Framework-agnostic core: invoice value objects, InvoiceMapper (EN 16931 category derivation, tax grouping, rounding, totals), BeliqClient over a cURL HTTP seam.
 - WooCommerce order adapter: maps an order to the normalized invoice shape through a read-only seam, unit-tested without a WordPress runtime.
 - Typed plugin settings with defaults and coercion.
