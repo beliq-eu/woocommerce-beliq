@@ -48,7 +48,7 @@ final class InvoiceGenerator
         $body = (new InvoiceMapper())->toGenerateBody(
             $source,
             $config->standard,
-            $config->output,
+            $config->effectiveOutput(),
             $config->effectiveProfile(),
         );
 
