@@ -5,8 +5,17 @@ namespace Beliq\Core\Service;
 /** A cURL-backed HttpClient with no framework dependency. */
 final class CurlHttpClient implements HttpClient
 {
-    public function __construct(private readonly int $timeoutSeconds = 30)
-    {
+    /**
+     * $connectTimeoutSeconds bounds the TCP connect alone. Against a
+     * black-holed host (a mistyped base URL, a DNS-resolvable host that drops
+     * SYNs) a connect that never completes is otherwise capped only by
+     * $timeoutSeconds, and this client runs inside the order hook a shop admin
+     * is waiting on. libcurl's own default is 300s.
+     */
+    public function __construct(
+        private readonly int $timeoutSeconds = 30,
+        private readonly int $connectTimeoutSeconds = 10,
+    ) {
     }
 
     public function request(string $method, string $url, array $headers = [], ?string $body = null): array
@@ -27,6 +36,7 @@ final class CurlHttpClient implements HttpClient
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPHEADER => $headerLines,
             CURLOPT_TIMEOUT => $this->timeoutSeconds,
+            CURLOPT_CONNECTTIMEOUT => $this->connectTimeoutSeconds,
             CURLOPT_POSTFIELDS => $body,
             CURLOPT_HEADERFUNCTION => static function ($_handle, string $line) use (&$responseHeaders): int {
                 $parts = explode(':', $line, 2);
