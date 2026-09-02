@@ -132,6 +132,17 @@ against the `wc_orders_meta` table; the admin download is verified end to end wi
 a real authenticated HTTP request. See `PASS-3-SMOKE-ROADMAP.md` and `smoke/README.md`.
 The WordPress.org submission stays operator-gated (screenshots + SVN + review).
 
+### Pass 4: the wp.org submission gate (done)
+
+Plugin Check reported 95 findings, 94 errors, across four `plugin_repo` checks, and
+an error there blocks submission before a reviewer sees the plugin. The run is clean
+now. The text domain is `beliq-e-invoicing` (the wp.org slug, which the repo and the
+Composer package do not share), beliq calls go through the WordPress HTTP API, and
+`Tested up to` is 7.1. Two blockers named in the 2026-08-30 publish-readiness audit
+did not survive being run against the tool. Full write-up, including what the audit
+missed, in `PASS-3-SMOKE-ROADMAP.md` section 3.4; the gate itself is
+`plugin-check/run.sh`.
+
 ## Operator-gated (post-go-live)
 
 - WordPress.org plugin directory submission and manual review, and/or a Packagist

@@ -2,7 +2,7 @@
 
 namespace Beliq\WooCommerce\Tests;
 
-use Beliq\Core\Service\CurlHttpClient;
+use Beliq\WooCommerce\Tests\Support\CurlHttpClient;
 use PHPUnit\Framework\TestCase;
 
 /**

@@ -6,6 +6,7 @@ use Beliq\Core\Service\BeliqClient;
 use Beliq\Core\Service\HttpClient;
 use Beliq\Core\Service\InvoiceMapper;
 use Beliq\WooCommerce\Config\PluginConfig;
+use Beliq\WooCommerce\Http\WpHttpClient;
 use Beliq\WooCommerce\Order\WcOrderData;
 use Beliq\WooCommerce\Order\WooOrderAdapter;
 use WC_Order;
@@ -52,9 +53,7 @@ final class InvoiceGenerator
             $config->effectiveProfile(),
         );
 
-        $client = $this->http !== null
-            ? new BeliqClient($config->apiKey, $config->baseUrl, $this->http)
-            : new BeliqClient($config->apiKey, $config->baseUrl);
+        $client = new BeliqClient($config->apiKey, $config->baseUrl, $this->http ?? new WpHttpClient());
         $generated = $client->generate($body);
 
         $extension = str_contains($generated['contentType'], 'pdf') ? 'pdf' : 'xml';

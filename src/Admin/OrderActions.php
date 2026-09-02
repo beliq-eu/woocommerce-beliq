@@ -45,7 +45,7 @@ final class OrderActions
      */
     public function addOrderAction(array $actions): array
     {
-        $actions['beliq_generate_invoice'] = __('Generate beliq e-invoice', 'woocommerce-beliq');
+        $actions['beliq_generate_invoice'] = __('Generate beliq e-invoice', 'beliq-e-invoicing');
 
         return $actions;
     }
@@ -68,24 +68,25 @@ final class OrderActions
     {
         check_admin_referer(self::NONCE_DOWNLOAD);
         if (!current_user_can(self::CAPABILITY)) {
-            wp_die(esc_html__('You are not allowed to download this document.', 'woocommerce-beliq'), '', ['response' => 403]);
+            wp_die(esc_html__('You are not allowed to download this document.', 'beliq-e-invoicing'), '', ['response' => 403]);
         }
 
         $orderId = isset($_GET['order_id']) ? absint(wp_unslash($_GET['order_id'])) : 0;
         $order = $orderId > 0 ? wc_get_order($orderId) : false;
         if (!$order instanceof WC_Order) {
-            wp_die(esc_html__('Order not found.', 'woocommerce-beliq'), '', ['response' => 404]);
+            wp_die(esc_html__('Order not found.', 'beliq-e-invoicing'), '', ['response' => 404]);
         }
 
         $path = $this->store->resolvePath($order);
         if ($path === null) {
-            wp_die(esc_html__('No document is stored for this order.', 'woocommerce-beliq'), '', ['response' => 404]);
+            wp_die(esc_html__('No document is stored for this order.', 'beliq-e-invoicing'), '', ['response' => 404]);
         }
 
         nocache_headers();
         header('Content-Type: ' . $this->store->contentType($order));
         header('Content-Disposition: attachment; filename="' . sanitize_file_name($this->store->downloadName($order)) . '"');
         header('Content-Length: ' . (string) filesize($path));
+        // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile -- WP_Filesystem has no streaming read; get_contents() would load the whole document into memory and then need escaping it cannot survive.
         readfile($path);
         exit;
     }
@@ -94,13 +95,13 @@ final class OrderActions
     {
         check_admin_referer(self::NONCE_GENERATE);
         if (!current_user_can(self::CAPABILITY)) {
-            wp_die(esc_html__('You are not allowed to generate this document.', 'woocommerce-beliq'), '', ['response' => 403]);
+            wp_die(esc_html__('You are not allowed to generate this document.', 'beliq-e-invoicing'), '', ['response' => 403]);
         }
 
         $orderId = isset($_POST['order_id']) ? absint(wp_unslash($_POST['order_id'])) : 0;
         $order = $orderId > 0 ? wc_get_order($orderId) : false;
         if (!$order instanceof WC_Order) {
-            wp_die(esc_html__('Order not found.', 'woocommerce-beliq'), '', ['response' => 404]);
+            wp_die(esc_html__('Order not found.', 'beliq-e-invoicing'), '', ['response' => 404]);
         }
 
         $notice = 'success';
@@ -131,9 +132,9 @@ final class OrderActions
         delete_transient($key);
 
         [$class, $message] = match ($notice) {
-            'success' => ['notice-success', __('beliq e-invoice generated.', 'woocommerce-beliq')],
-            'skipped' => ['notice-warning', __('No beliq e-invoice was generated: this order is outside the configured scope.', 'woocommerce-beliq')],
-            default => ['notice-error', __('beliq e-invoice generation failed. See WooCommerce > Status > Logs (source: beliq).', 'woocommerce-beliq')],
+            'success' => ['notice-success', __('beliq e-invoice generated.', 'beliq-e-invoicing')],
+            'skipped' => ['notice-warning', __('No beliq e-invoice was generated: this order is outside the configured scope.', 'beliq-e-invoicing')],
+            default => ['notice-error', __('beliq e-invoice generation failed. See WooCommerce > Status > Logs (source: beliq).', 'beliq-e-invoicing')],
         };
 
         printf(

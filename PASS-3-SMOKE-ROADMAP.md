@@ -95,6 +95,12 @@ Done in-repo:
   file order.
 - Plugin header `WC tested up to` bumped to `10.9` (the smoke ran WooCommerce
   10.9.1).
+- Plugin Check is clean (3.4).
+
+**The wp.org slug is `beliq-e-invoicing`, not `woocommerce-beliq`.** wp.org derives
+it from the plugin's display name, and a slug whose first term is `woocommerce` is a
+Guideline 17 trademark rejection. The repo, the Composer package and the main file
+keep their own name; only the distributed plugin identity changes.
 
 #### Remaining operator steps
 
@@ -115,8 +121,9 @@ At/after beliq go-live, in order:
    (or the `smoke/` harness pointed at production) so the reviewer's path is
    known-good. This is the deferred live-key smoke.
 2. **Finalize version metadata in `readme.txt`.**
-   - `Tested up to`: set to the current WordPress version (Dashboard > Updates).
-     It sits at `6.7`; bump to the version WordPress is actually on at submission.
+   - `Tested up to`: sits at `7.1`. Re-check it at submission (wp.org compares it
+     against whatever it calls current on the day) by running `plugin-check/run.sh`,
+     which fails on `outdated_tested_upto_header`.
    - `WC tested up to` in `woocommerce-beliq.php` is `10.9`; nudge it if WooCommerce
      has moved on by then.
    - Flip `CHANGELOG.md` `0.1.0 (unreleased)` to the release date.
@@ -124,20 +131,97 @@ At/after beliq go-live, in order:
 3. **Build the submission zip** (plugin runtime only, self-contained autoloader, no
    Composer install needed):
    - Include: `woocommerce-beliq.php`, `src/`, `languages/`, `readme.txt`, `LICENSE`.
-   - Exclude: `tests/`, `smoke/`, `tmp/`, `.github/`, `phpunit.xml`, `phpcs.xml`,
-     `composer.json`/`composer.lock`, `ROADMAP.md`, `PASS-3-SMOKE-ROADMAP.md`,
-     `.git/`, `vendor/`.
+     This is the `DIST` array in `plugin-check/run.sh`, which stages exactly that set.
+   - Exclude: `tests/`, `smoke/`, `plugin-check/`, `tmp/`, `.github/`, `phpunit.xml`,
+     `phpcs.xml`, `composer.json`/`composer.lock`, `ROADMAP.md`,
+     `PASS-3-SMOKE-ROADMAP.md`, `.git/`, `vendor/`.
+   - The ZIP's top-level directory must be `beliq-e-invoicing`.
 4. **Submit for review** via the current wp.org Plugin Developer Handbook flow
    (upload the zip at the "Add your plugin" page). Wait for the review email; a
    human checks the code and the external-service disclosure.
 5. **On approval, SVN publish.** Check out the assigned repo
-   (`https://plugins.svn.wordpress.org/woocommerce-beliq/`):
+   (`https://plugins.svn.wordpress.org/beliq-e-invoicing/`):
    - Put the plugin files in `/trunk`.
    - Put `screenshot-1.png` + `screenshot-2.png` (from `tmp/`) in `/assets`, plus an
      icon/banner if desired. Assets live in `/assets`, never in `/trunk`.
    - `svn copy trunk tags/0.1.0`, confirm `Stable tag: 0.1.0`, then `svn commit`.
 6. **Verify the live listing.** Screenshots and description render; a fresh install
    against production `api.beliq.eu` generates a green invoice end to end.
+
+### 3.4 - Plugin Check, the wp.org submission gate (DONE)
+
+Plugin Check has been mandatory since 2024-10-01: an error in its `plugin_repo`
+category blocks the submission before a reviewer sees the plugin. Run it with
+`plugin-check/run.sh` (see that directory's README). Against the distribution on
+WordPress 7.1 it reported **95 findings, 94 of them errors**, from four checks:
+
+| Check | Findings | What |
+|---|---|---|
+| `i18n_usage` | 78 | text domain `woocommerce-beliq` against the slug |
+| `plugin_review_phpcs` | 8 | 7 raw cURL calls, 1 `readfile()` |
+| `late_escaping` | 7 | `ExceptionNotEscaped` on values that never reach output |
+| `plugin_readme` | 1 | `Tested up to: 6.7` against core 7.1 |
+| `plugin_header_fields` | 1 (warning) | the `Text Domain` header against the slug |
+
+All four are `plugin_repo`. The run is now clean, including `--include-experimental`.
+
+**Two of the blockers named in the 2026-08-30 audit are not blockers.** Neither
+survived being run against the tool:
+
+- **`defined('ABSPATH')` on the 24 files under `src/`.** `direct_file_access` does
+  exist and does fire, but only on a file with side effects: dropping a
+  `<?php echo "hello";` into the plugin produces `missing_direct_file_access_protection`
+  immediately, while every `src/` file (all of them a namespace plus a class
+  declaration) produces nothing. 24 guard lines would have been noise.
+- **The `woocommerce-` trademark.** Real, but a **warning**, not an error, and it is
+  keyed on the slug. It is gone by virtue of submitting as `beliq-e-invoicing`.
+
+**What the audit missed:** the cURL calls and the `readfile()`, 8 errors from
+`plugin_review_phpcs`, and the 7 escaping errors. It looked at `i18n`, `ABSPATH` and
+the readme header and stopped.
+
+#### The fixes
+
+- **Text domain -> `beliq-e-invoicing`** across 78 call sites, the plugin header,
+  `phpcs.xml.dist`, and `languages/woocommerce-beliq.pot` -> `beliq-e-invoicing.pot`.
+  A text domain that does not match the slug is never imported into
+  translate.wordpress.org, so no language pack could ever exist.
+- **cURL -> the WordPress HTTP API.** `Beliq\WooCommerce\Http\WpHttpClient` implements
+  the existing `HttpClient` seam over `wp_remote_request`, so a site's proxy
+  configuration, `WP_HTTP_BLOCK_EXTERNAL` and the `http_request_args` filters reach
+  beliq calls. This is a review guideline, not a lint opinion: raw cURL bypasses all
+  of it. The connect bound PR #11 added survives the move for free: `WP_Http` passes
+  only `timeout` to Requests, whose own `connect_timeout` default is 10s.
+  `BeliqClient`'s `$http` parameter loses its default, because the framework-agnostic
+  core can no longer name a transport. `CurlHttpClient` moves to
+  `tests/Support/`, where `LiveGenerateSmokeTest` still needs it: PHPUnit runs
+  outside WordPress and has no `wp_remote_request`. Its connect-timeout test moves
+  with it.
+- **`readfile()` stays**, annotated. `WP_Filesystem` has no streaming read, and the
+  `get_contents()` + `echo` alternative was tried against the tool: it trades
+  `file_system_operations_readfile` for `OutputNotEscaped` on bytes that cannot be
+  escaped.
+- **The escaping errors are annotated, not escaped.** The values reach
+  `wc_get_logger()` and nothing else; the admin notice `OrderActions::renderNotice()`
+  prints is a fixed translated string run through `esc_html()`. Escaping at the throw
+  would corrupt the log line and drag WordPress into the framework-agnostic core. Each
+  annotation names the invariant so the next person who renders `getMessage()` sees
+  it. `phpcs:ignore` was verified to be honoured, and a plugin-root `phpcs.xml` was
+  verified **not** to be: Plugin Check uses its own ruleset.
+
+#### `Tested up to: 7.1` is a checked claim
+
+wp.org forces the header to the current release, so the question is what backs it.
+`plugin-check/run.sh --with-surfaces` installs WordPress 7.1 and WooCommerce 11.0.1,
+activates the plugin, and asserts the integration registers, the order-status trigger
+and both admin-post endpoints carry **this plugin's** callbacks, HPOS compatibility is
+declared, and the text domain matches the slug. Ten checks, all green; with the plugin
+deactivated eight of them fail, so the script is not vacuously passing.
+
+That covers loading and hooking, not generating. The full order-to-invoice smoke is
+still pinned to what `smoke/` ran, which is why `WC tested up to` stays at `10.9`
+rather than following WooCommerce to 11.0.1: bumping it honestly needs the smoke
+re-run, and that needs a beliq API key.
 
 ## Decisions
 

@@ -11,7 +11,7 @@
  * Author URI:           https://beliq.eu
  * License:              MIT
  * License URI:          https://opensource.org/licenses/MIT
- * Text Domain:          woocommerce-beliq
+ * Text Domain:          beliq-e-invoicing
  * Domain Path:          /languages
  * WC requires at least: 8.0
  * WC tested up to:      10.9
@@ -56,7 +56,7 @@ add_action('plugins_loaded', static function (): void {
     if (!class_exists('WooCommerce')) {
         add_action('admin_notices', static function (): void {
             echo '<div class="notice notice-error"><p>'
-                . esc_html__('beliq e-invoicing requires WooCommerce to be installed and active.', 'woocommerce-beliq')
+                . esc_html__('beliq e-invoicing requires WooCommerce to be installed and active.', 'beliq-e-invoicing')
                 . '</p></div>';
         });
 
