@@ -7,3 +7,9 @@ composer.lock
 .env
 .env.*
 !.env.example
+
+# plugin-check staging area
+/plugin-check/dist/
+
+# Scratch. The wp.org listing screenshots live in SVN /assets, never in trunk.
+/tmp/

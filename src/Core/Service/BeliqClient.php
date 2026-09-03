@@ -15,8 +15,8 @@ final class BeliqClient
 
     public function __construct(
         private readonly string $apiKey,
-        string $baseUrl = 'https://api.beliq.eu',
-        private readonly HttpClient $http = new CurlHttpClient(),
+        string $baseUrl,
+        private readonly HttpClient $http,
     ) {
         $this->baseUrl = rtrim($baseUrl, '/');
     }
@@ -96,11 +96,10 @@ final class BeliqClient
 
         $decoded = json_decode($res['body'], true);
         if (!is_array($decoded)) {
-            throw new BeliqApiException(
-                'beliq ' . $operation . ' returned a response that is not JSON.',
-                'INVALID_RESPONSE',
-                $res['status'],
-            );
+            $message = 'beliq ' . $operation . ' returned a response that is not JSON.';
+
+            // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- $operation is one of this class's own literals, and the message reaches wc_get_logger() only.
+            throw new BeliqApiException($message, 'INVALID_RESPONSE', $res['status']);
         }
 
         if (isset($decoded['data']) && is_array($decoded['data'])) {
@@ -130,6 +129,7 @@ final class BeliqClient
             $details = $decoded['error']['details'] ?? null;
         }
 
+        // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- $message and $code come off the wire, and the only reader is wc_get_logger(); the admin notice OrderActions renders is a fixed translated string. Escape at the output site if that ever changes.
         throw new BeliqApiException($message, $code, $res['status'], $details);
     }
 }

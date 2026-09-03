@@ -9,6 +9,7 @@ use Beliq\Core\Invoice\SourceLine;
 use Beliq\Core\Invoice\SourceOrder;
 use Beliq\Core\Service\BeliqClient;
 use Beliq\Core\Service\InvoiceMapper;
+use Beliq\WooCommerce\Tests\Support\CurlHttpClient;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -34,7 +35,7 @@ final class LiveGenerateSmokeTest extends TestCase
         }
 
         $baseUrl = getenv('BELIQ_BASE_URL') ?: 'https://api.beliq.eu';
-        $this->client = new BeliqClient($apiKey, $baseUrl);
+        $this->client = new BeliqClient($apiKey, $baseUrl, new CurlHttpClient());
         $this->mapper = new InvoiceMapper();
     }
 

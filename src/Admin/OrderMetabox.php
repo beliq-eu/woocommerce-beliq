@@ -32,7 +32,7 @@ final class OrderMetabox
 
         add_meta_box(
             'beliq_invoice',
-            __('beliq e-invoice', 'woocommerce-beliq'),
+            __('beliq e-invoice', 'beliq-e-invoicing'),
             [$this, 'render'],
             $screen,
             'side',
@@ -57,11 +57,11 @@ final class OrderMetabox
 
         if ($hasDocument) {
             $generatedAt = $this->store->generatedAt($order);
-            echo '<p>' . esc_html__('A compliant e-invoice is stored for this order.', 'woocommerce-beliq') . '</p>';
+            echo '<p>' . esc_html__('A compliant e-invoice is stored for this order.', 'beliq-e-invoicing') . '</p>';
             if ($generatedAt !== null) {
                 echo '<p><small>' . esc_html(sprintf(
                     /* translators: %s: generation timestamp */
-                    __('Generated %s', 'woocommerce-beliq'),
+                    __('Generated %s', 'beliq-e-invoicing'),
                     $generatedAt,
                 )) . '</small></p>';
             }
@@ -71,9 +71,9 @@ final class OrderMetabox
                 OrderActions::NONCE_DOWNLOAD,
             );
             echo '<p><a class="button button-primary" href="' . esc_url($downloadUrl) . '">'
-                . esc_html__('Download', 'woocommerce-beliq') . '</a></p>';
+                . esc_html__('Download', 'beliq-e-invoicing') . '</a></p>';
         } else {
-            echo '<p>' . esc_html__('No e-invoice has been generated for this order yet.', 'woocommerce-beliq') . '</p>';
+            echo '<p>' . esc_html__('No e-invoice has been generated for this order yet.', 'beliq-e-invoicing') . '</p>';
         }
 
         echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
@@ -81,8 +81,8 @@ final class OrderMetabox
         echo '<input type="hidden" name="order_id" value="' . esc_attr((string) $orderId) . '" />';
         wp_nonce_field(OrderActions::NONCE_GENERATE);
         $label = $hasDocument
-            ? __('Regenerate', 'woocommerce-beliq')
-            : __('Generate now', 'woocommerce-beliq');
+            ? __('Regenerate', 'beliq-e-invoicing')
+            : __('Generate now', 'beliq-e-invoicing');
         echo '<button type="submit" class="button">' . esc_html($label) . '</button>';
         echo '</form>';
     }

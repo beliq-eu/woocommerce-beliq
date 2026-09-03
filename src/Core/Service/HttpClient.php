@@ -3,9 +3,9 @@
 namespace Beliq\Core\Service;
 
 /**
- * The HTTP seam. Pass 1 ships CurlHttpClient; the Shopware wiring can inject an
- * adapter over Symfony's HttpClient, and tests inject a fake sender. The body is
- * raw bytes so binary responses (PDF) survive intact.
+ * The HTTP seam. The plugin injects WpHttpClient, which goes through the
+ * WordPress HTTP API; tests inject a fake sender. The body is raw bytes so
+ * binary responses (PDF) survive intact.
  */
 interface HttpClient
 {

@@ -16,6 +16,7 @@
 
 use Automattic\WooCommerce\Utilities\OrderUtil;
 use Beliq\WooCommerce\Config\WooPluginConfigProvider;
+use Beliq\WooCommerce\Http\WpHttpClient;
 use Beliq\WooCommerce\Invoice\DocumentStore;
 use Beliq\WooCommerce\Invoice\InvoiceGenerator;
 use Beliq\WooCommerce\Order\WcOrderData;
@@ -239,7 +240,7 @@ $cases = [
     ],
 ];
 
-$client = new BeliqClient($apiKey, $baseUrl);
+$client = new BeliqClient($apiKey, $baseUrl, new WpHttpClient());
 $firstOrderId = null;
 
 foreach ($cases as $label => $c) {

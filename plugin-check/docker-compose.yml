@@ -1,0 +1,57 @@
+# WordPress + Plugin Check for the wp.org submission gate.
+#
+# The plugin is staged, not bind-mounted: Plugin Check reads whatever sits in the
+# plugin directory, and what gets submitted is the distribution (no vendor/, no
+# tests/, no smoke/). run.sh copies the distribution in. The directory is named
+# beliq-e-invoicing because Plugin Check derives the expected text domain and the
+# trademark verdict from the directory name, which on wp.org is the slug.
+name: beliq-plugin-check
+
+services:
+  db:
+    image: mariadb:11
+    environment:
+      MARIADB_DATABASE: wordpress
+      MARIADB_USER: wordpress
+      MARIADB_PASSWORD: wordpress
+      MARIADB_ROOT_PASSWORD: root
+    volumes:
+      - db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  wordpress:
+    image: wordpress:php8.3-apache
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wp:/var/www/html
+
+  wpcli:
+    image: wordpress:cli-php8.3
+    user: "33:33"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wp:/var/www/html
+      - ./:/harness:ro
+    entrypoint: ["tail", "-f", "/dev/null"]
+
+volumes:
+  db:
+  wp:
