@@ -25,6 +25,17 @@ jobs:
       - name: Scrub check (no em-dash)
         run: composer scrub:check
 
+  # The wp.org submission gate. Plugin Check is installed from wordpress.org on
+  # every run, so this tracks the rules wp.org actually enforces rather than a
+  # pinned copy of them. --ignore-calendar drops the one code whose input is the
+  # clock; the wporg-currency workflow owns that one.
+  plugin-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: wp.org Plugin Check
+        run: ./plugin-check/run.sh --ignore-calendar
+
   phpcs:
     runs-on: ubuntu-latest
     steps:
