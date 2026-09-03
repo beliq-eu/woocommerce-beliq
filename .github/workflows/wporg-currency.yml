@@ -1,0 +1,28 @@
+# outdated_tested_upto_header is the one Plugin Check error this repo cannot fix
+# by being correct: readme.txt's "Tested up to" is compared against whatever
+# wordpress.org calls current, so it starts failing when WordPress ships a
+# release and nobody here has touched anything. A push trigger answers "is this
+# commit ok", never "is today ok", so it needs a schedule of its own.
+#
+# This runs the same plugin-check/run.sh the PR gate runs, without
+# --ignore-calendar, so the two cannot drift apart. A failure here means bump
+# readme.txt (and re-run smoke/ if WooCommerce moved too), not that the code
+# broke. GitHub notifies the account that last touched the cron when a scheduled
+# run fails, which is the only thing watching this.
+#
+# Delivery slips: GitHub drops and delays scheduled fires, daily crons by 11 to
+# 13 hours in measured cases. Weekly is sized for that, not for punctuality.
+name: wp.org currency
+
+on:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+jobs:
+  currency:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Plugin Check, including the calendar-driven codes
+        run: ./plugin-check/run.sh
