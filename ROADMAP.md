@@ -40,6 +40,21 @@ the core-sharing decision below).
    merchant-configured category (default `Z`). Reverse-charge / intra-community /
    export exemption reasons are a future per-connector enhancement (the beliq API
    accepts them; the plugin does not yet populate them).
+5. **The wp.org slug is `beliq-e-invoicing`; the repo, the Composer package and
+   the main file keep their own name.** wp.org derives the slug from the plugin's
+   display name, the text domain has to match it or translate.wordpress.org never
+   imports the strings, and a slug whose first term is `woocommerce` is a
+   Guideline 17 trademark rejection. Two identities, deliberately.
+6. **The version stays `0.1.0` until the publish pass, which is where `1.0.0` gets
+   decided.** Every published beliq connector is 0.x (n8n 0.2.0, activepieces
+   0.2.1, directus 0.2.3, beliq-mcp 0.3.1, beliq-cli 0.2.1, beliq-sevdesk 0.2.1,
+   `@beliq/sdk` 0.3.1, `beliq` on PyPI 0.2.1), and beliq itself has not gone live,
+   so a 1.x plugin would be the only 1.x thing in the portfolio and would claim
+   more than the product does. Nothing is pinned to the number yet: no git tag, no
+   wp.org listing, no Packagist listing. The publish pass already reopens the
+   version metadata (`Stable tag`, the plugin header, the changelog date), so
+   promoting to `1.0.0` there costs the same as now and can be decided against a
+   live API. `Stable tag` and the header `Version` must always agree.
 
 ## Passes
 
@@ -142,6 +157,41 @@ Composer package do not share), beliq calls go through the WordPress HTTP API, a
 did not survive being run against the tool. Full write-up, including what the audit
 missed, in `PASS-3-SMOKE-ROADMAP.md` section 3.4; the gate itself is
 `plugin-check/run.sh`.
+
+### Pass 5: the wp.org gate runs in CI and weekly (done)
+
+Pass 4 cleared Plugin Check and nothing kept it clear. `ci.yml` gains a
+`plugin-check` job running `plugin-check/run.sh --ignore-calendar`, and
+`wporg-currency.yml` runs the same script weekly without that flag.
+
+**`wp plugin check` exits 0 whatever it finds**, in every output format including
+`strict-table`, `strict-csv` and `strict-json`, verified with a confirmed ERROR
+present. So `run.sh` as first committed printed findings and exited 0: a gate
+that surfaces and never blocks. The verdict now comes from a second run with
+`--format=strict-json`, which prints a JSON array when there are findings and the
+plain success line when there are none. **"Did not parse as JSON" therefore has
+to fail**, or a wp-cli crash reads as clean.
+
+The split is the point. `outdated_tested_upto_header` compares `readme.txt`
+against whatever wordpress.org calls current, so it starts failing on a WordPress
+release with nothing changed here, and it would redden PRs that never touched the
+readme. It is dropped from the PR gate and owned by the weekly workflow, which
+runs the same script rather than a second copy of the rule. Scheduled fires slip
+(GitHub delays daily crons by 11 to 13 hours in measured cases); weekly is sized
+for that. A failed scheduled run notifies the account that last touched the cron,
+which is the only thing watching it.
+
+Falsified in both directions before being trusted, all four arms as designed:
+
+| Tree | full | `--ignore-calendar` |
+|---|---|---|
+| clean | 0 | 0 |
+| `Tested up to` back to 6.7 | **1** | 0 |
+| one text-domain call reverted | **1** | **1** |
+
+Plus the parser's own branches: an error row exits 1, a warning-only array exits
+0, the success line exits 0, and both a wp-cli error string and empty output exit
+1 rather than reading as clean. An unknown argument exits 2.
 
 ## Operator-gated (post-go-live)
 

@@ -223,6 +223,18 @@ still pinned to what `smoke/` ran, which is why `WC tested up to` stays at `10.9
 rather than following WooCommerce to 11.0.1: bumping it honestly needs the smoke
 re-run, and that needs a beliq API key.
 
+### 3.5 - The gate runs in CI and weekly (DONE)
+
+3.4 cleared Plugin Check; nothing kept it clear. `ci.yml` runs
+`plugin-check/run.sh --ignore-calendar` on every PR and push, and
+`wporg-currency.yml` runs the same script weekly without the flag. Both details,
+the verdict and the split, are in `plugin-check/README.md`; the falsification
+table is in `ROADMAP.md` "Pass 5".
+
+The one fact worth repeating here, because it invalidates the obvious CI step:
+**`wp plugin check` exits 0 whatever it finds**, in every output format. `run.sh`
+as committed in 3.4 printed the findings and exited 0.
+
 ## Decisions
 
 - **Real API key, not the unauth bypass.** More faithful (exercises the plugin's
