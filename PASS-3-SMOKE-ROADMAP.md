@@ -136,8 +136,10 @@ At/after beliq go-live, in order:
      `phpcs.xml`, `composer.json`/`composer.lock`, `ROADMAP.md`,
      `PASS-3-SMOKE-ROADMAP.md`, `.git/`, `vendor/`.
    - The ZIP's top-level directory must be `beliq-e-invoicing`.
-4. **Submit for review** via the current wp.org Plugin Developer Handbook flow
-   (upload the zip at the "Add your plugin" page). Wait for the review email; a
+4. **Submit for review** at `https://wordpress.org/plugins/developers/add/`, which
+   bounces through `https://login.wordpress.org/` if you are not signed in (checked
+   2026-09-03). Manual review, stated turnaround 1 to 10 days with a 5-business-day
+   target. No company, no fee. Wait for the review email; a
    human checks the code and the external-service disclosure.
 5. **On approval, SVN publish.** Check out the assigned repo
    (`https://plugins.svn.wordpress.org/beliq-e-invoicing/`):
