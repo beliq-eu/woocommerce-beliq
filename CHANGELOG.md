@@ -2,6 +2,9 @@
 
 ## 0.1.0 (unreleased)
 
+- The text domain is `beliq-e-invoicing`, matching the wp.org slug. A domain that does not match the slug is never imported into translate.wordpress.org, so no language pack could ever exist for it.
+- beliq calls go through the WordPress HTTP API (`wp_remote_request`) rather than cURL directly, so a site's proxy configuration, `WP_HTTP_BLOCK_EXTERNAL` and the `http_request_args` filters apply to them.
+- `Tested up to` is 7.1.
 - The Output setting resolves to XML on XRechnung and Peppol BIS. Neither has a hybrid PDF, so the API answered `output=pdf` for them with a 400 on every order. The setting's own label ("PDF (hybrid, where the format supports it)") already said this is what it means.
 - Framework-agnostic core: invoice value objects, InvoiceMapper (EN 16931 category derivation, tax grouping, rounding, totals), BeliqClient over a cURL HTTP seam.
 - WooCommerce order adapter: maps an order to the normalized invoice shape through a read-only seam, unit-tested without a WordPress runtime.

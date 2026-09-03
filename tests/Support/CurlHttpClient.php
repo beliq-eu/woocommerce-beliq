@@ -1,16 +1,21 @@
 <?php declare(strict_types=1);
 
-namespace Beliq\Core\Service;
+namespace Beliq\WooCommerce\Tests\Support;
 
-/** A cURL-backed HttpClient with no framework dependency. */
+use Beliq\Core\Service\HttpClient;
+
+/**
+ * A cURL-backed HttpClient for the tests that run outside WordPress. The shipped
+ * plugin talks to beliq through WpHttpClient; wp_remote_request() does not exist
+ * in a bare PHPUnit process, so the live gate needs its own transport.
+ */
 final class CurlHttpClient implements HttpClient
 {
     /**
      * $connectTimeoutSeconds bounds the TCP connect alone. Against a
      * black-holed host (a mistyped base URL, a DNS-resolvable host that drops
      * SYNs) a connect that never completes is otherwise capped only by
-     * $timeoutSeconds, and this client runs inside the order hook a shop admin
-     * is waiting on. libcurl's own default is 300s.
+     * $timeoutSeconds. libcurl's own default is 300s.
      */
     public function __construct(
         private readonly int $timeoutSeconds = 30,
