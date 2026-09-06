@@ -1,5 +1,7 @@
 # woocommerce-beliq - Pass 3 (live Docker smoke + wp.org submission)
 
+`status: live, next: 3.3, confirm free-tier signup works and then run the operator's wp.org submission and SVN publish`
+
 Living roadmap for D8.2 Pass 3. Passes 1 and 2 are merged and green (see
 `ROADMAP.md`). This pass proves the WordPress runtime path end to end against a
 local beliq api + engine, then preps the operator-gated WordPress.org submission.
@@ -104,22 +106,27 @@ keep their own name; only the distributed plugin identity changes.
 
 #### Remaining operator steps
 
-The publish itself waits for the **public beliq go-live**. The plugin does nothing
-without a reachable `api.beliq.eu` and a working free tier: the wp.org reviewer
-tests functionality, and the readme promises "the free tier is enough to evaluate
-the plugin." Shipping before the production API and signup are live would fail
-review or land users on a dead endpoint. So the SVN publish is a post-go-live step.
+The publish waits on a **working free tier**, not on the API itself. The wp.org
+reviewer tests functionality and the readme promises "the free tier is enough to
+evaluate the plugin", so a reviewer who cannot sign up and generate fails the
+submission. `api.beliq.eu` answers and `dashboard.beliq.eu` serves, so the
+reachability half of that gate is met; signup is the half still to prove, and
+step 1 below is where it gets proven.
 
-Can be done any time before go-live:
+Whether to submit ahead of the public launch announcement is a separate call, and
+it is the operator's.
+
+Can be done at any time:
 - Merge the in-repo prep (this pass).
 - Register a WordPress.org account for the submitter, if there isn't one.
 
-At/after beliq go-live, in order:
+Then, in order:
 
-1. **Confirm the live path.** Ensure production `https://api.beliq.eu` is live and
-   free-tier signup works. Mint a real free-tier key and run one manual generate
-   (or the `smoke/` harness pointed at production) so the reviewer's path is
-   known-good. This is the deferred live-key smoke.
+1. **Confirm the live path.** `https://api.beliq.eu` is up and answers, and
+   `dashboard.beliq.eu` serves, so what is left to prove here is that free-tier
+   signup works. Mint a real free-tier key and run one manual generate (or the
+   `smoke/` harness pointed at production) so the reviewer's path is known-good.
+   This is the deferred live-key smoke.
 2. **Finalize version metadata in `readme.txt`.**
    - `Tested up to`: sits at `7.1`. Re-check it at submission (wp.org compares it
      against whatever it calls current on the day) by running `plugin-check/run.sh`,
