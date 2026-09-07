@@ -1,6 +1,6 @@
 # woocommerce-beliq - Pass 3 (live Docker smoke + wp.org submission)
 
-`status: live, next: 3.3, confirm free-tier signup works and then run the operator's wp.org submission and SVN publish`
+`status: live, next: 3.3, the operator's wp.org submission and SVN publish; the live-path check that gated it is done`
 
 Living roadmap for D8.2 Pass 3. Passes 1 and 2 are merged and green (see
 `ROADMAP.md`). This pass proves the WordPress runtime path end to end against a
@@ -106,12 +106,11 @@ keep their own name; only the distributed plugin identity changes.
 
 #### Remaining operator steps
 
-The publish waits on a **working free tier**, not on the API itself. The wp.org
+The publish waited on a **working free tier**, not on the API itself: the wp.org
 reviewer tests functionality and the readme promises "the free tier is enough to
 evaluate the plugin", so a reviewer who cannot sign up and generate fails the
-submission. `api.beliq.eu` answers and `dashboard.beliq.eu` serves, so the
-reachability half of that gate is met; signup is the half still to prove, and
-step 1 below is where it gets proven.
+submission. **That gate is now discharged, proven against production on
+2026-09-07** (step 1 below carries the evidence).
 
 Whether to submit ahead of the public launch announcement is a separate call, and
 it is the operator's.
@@ -122,11 +121,46 @@ Can be done at any time:
 
 Then, in order:
 
-1. **Confirm the live path.** `https://api.beliq.eu` is up and answers, and
-   `dashboard.beliq.eu` serves, so what is left to prove here is that free-tier
-   signup works. Mint a real free-tier key and run one manual generate (or the
-   `smoke/` harness pointed at production) so the reviewer's path is known-good.
-   This is the deferred live-key smoke.
+1. **Confirm the live path. DONE 2026-09-07**, walked as a first-time reviewer
+   would in a clean browser with no prior session.
+
+   - **Signup works, card-free.** `/auth/register` takes email + a 10-character
+     password; the organization name is optional and is auto-generated when left
+     blank. The Cap.js captcha is invisible and self-solving, so it is not a
+     barrier to a reviewer. Terms and a business affirmation are both required
+     checkboxes, and the Terms of Service and Privacy Policy links resolve.
+   - **Email delivery works.** Registration returns an opaque `verifyToken` in the
+     URL and sends a separate 6-digit code, 15-minute expiry, limited attempts,
+     with a resend path. The token alone does not verify the account. The code
+     arrived and verification landed on `/auth/verified`.
+   - **The org lands on Free automatically.** `GET /v1/me` reports
+     `plan: {id: null, name: "Free"}`, `livemode: true`, `rateLimitPerMinute: 10`
+     and `quota.limit: 20`, which matches `FREE_TIER` in `beliq-types` exactly. No
+     card, no manual provisioning.
+   - **A free-tier live key generates a green document.** One `POST /v1/generate`
+     with `standard: xrechnung`, `output: xml` returned a 5,949-byte
+     `rsm:CrossIndustryInvoice` customized
+     `urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0`.
+     Posting those bytes back to `/v1/validate` returned `valid: true`, **0 errors
+     and 0 warnings** (CII, schematron 1.3.16), so green is asserted by
+     re-validating rather than by trusting the 200, the same rule 3.2 uses.
+   - **Quota metering is real and `/v1/me` is free.** The two calls moved
+     `quota.used` from 0 to 2; three `/v1/me` calls moved it not at all, which is
+     why every beliq connector uses `/v1/me` as its credential test.
+
+   The invoice used was the **prefilled sample the zapier connector ships**, so
+   this also re-confirms against production the "Verified against POST
+   /v1/generate" comment in `tools/zapier-beliq/src/creates/generateInvoice.ts`.
+
+   Account: `wporg-test@beliq.eu`, org slug `wporg-reviewer-test-51a6a3`. It is a
+   disposable evaluation org and should be deleted once the submission is through;
+   Free allows one owned org per account, so the address is spent until then.
+
+   What this does **not** cover: the full order-to-invoice path through WordPress
+   against production. 3.2 proved that against a local api + engine built from the
+   same `main`. Re-running `smoke/run.sh` pointed at `api.beliq.eu` is the stronger
+   check and is still available; it costs roughly 8 to 10 of the 20 monthly free
+   documents.
 2. **Finalize version metadata in `readme.txt`.**
    - `Tested up to`: sits at `7.1`. Re-check it at submission (wp.org compares it
      against whatever it calls current on the day) by running `plugin-check/run.sh`,
