@@ -205,8 +205,11 @@ Plus the parser's own branches: an error row exits 1, a warning-only array exits
   readme's promise that the free tier is enough to evaluate the plugin holds, and
   what remains is the operator's wp.org account, the screenshots, and the decision
   on timing against the public launch announcement.
-- Live-key smoke: the API half is done (see above). Re-running `smoke/` against
-  production is the remaining stronger check, and is not a blocker for submission.
+- Live-key smoke: **done 2026-09-07**. `smoke/` ran against production
+  `api.beliq.eu` on WordPress 7.1 + WooCommerce 11.1.0, 38 of 38 checks, which is
+  what `WC tested up to: 11.1` rests on. It caught a real defect first: the client
+  asked `/v1/generate` for JSON, so every stored invoice was the API's base64
+  envelope rather than the document. See `PASS-3-SMOKE-ROADMAP.md` 3.6.
 
 ## Conventions
 

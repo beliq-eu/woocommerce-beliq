@@ -1,6 +1,6 @@
 # woocommerce-beliq - Pass 3 (live Docker smoke + wp.org submission)
 
-`status: live, next: 3.3, the operator's wp.org submission and SVN publish; the live-path check that gated it is done`
+`status: live, next: 3.3, the operator's wp.org submission and SVN publish; the live path and a full production smoke on WooCommerce 11.1 are both green`
 
 Living roadmap for D8.2 Pass 3. Passes 1 and 2 are merged and green (see
 `ROADMAP.md`). This pass proves the WordPress runtime path end to end against a
@@ -277,6 +277,53 @@ table is in `ROADMAP.md` "Pass 5".
 The one fact worth repeating here, because it invalidates the obvious CI step:
 **`wp plugin check` exits 0 whatever it finds**, in every output format. `run.sh`
 as committed in 3.4 printed the findings and exited 0.
+
+### 3.6 - The smoke against production, and the bug only it could find (DONE 2026-09-07)
+
+Re-ran the committed harness with `BELIQ_BASE_URL=https://api.beliq.eu` and a
+free-tier live key, on **WordPress 7.1 + WooCommerce 11.1.0**. First run: **9 of
+38 failed**. Second run, after the fix: **38 of 38**.
+
+**Every stored invoice was the API's JSON envelope instead of the invoice.**
+`/v1/generate` returns the raw file by default and switches to a JSON envelope
+carrying the file base64-encoded as soon as the caller ranks `application/json`
+above the document's own media type. `BeliqClient::authHeaders()` set
+`Accept: application/json` for all three endpoints. `me` and `validate` do want
+JSON; `generate` does not. All three formats stored an 8 to 54 KB JSON blob, and
+the ZUGFeRD case stored it under a `.xml` extension.
+
+**Why it survived to production.** The transport changed after this smoke last
+ran. Pass 4 swapped `CurlHttpClient` for `WpHttpClient` to clear the wp.org gate
+and re-ran Plugin Check and the unit tests, not the order-to-invoice path. The
+`Accept` header was covered by nothing, and the local api the July run used
+predates the JSON mode, so the header was inert when it was written and became
+load-bearing when the API grew content negotiation. `prefersJsonEnvelope` in
+beliq-api even documents that callers opt in by accident.
+
+**The generalisable half, and it is the whole reason this pass exists: a green
+suite is green about the transport it ran on.** Swapping the transport of a client
+invalidates every test above it that did not assert on the wire, and the unit
+tests here inject a fake `HttpClient`, so they could not see the header either.
+The guard is now `testGenerateAsksForTheDocumentAndNeverTheJsonEnvelope`, which
+asserts the header for both `xml` and `pdf` and fails when the shared header is
+restored. Mirrored to `shopware-beliq` under locked decision 4, where the same
+defect sat unobserved because its smoke has only ever run against a local api.
+
+Two harness defects the run also exposed, both now fixed:
+
+- **The smoke was not re-runnable.** Its two capability-gate users were created
+  with `wp_insert_user`, which returns `WP_Error('existing_user_login')` on a
+  second run against a stack that was not torn down. Both capability checks
+  failed on that rather than on capabilities, which reads exactly like a
+  WooCommerce 11 permissions regression and is not one. Pass 3's deliverable was
+  a re-runnable harness, so this was the harness failing its own goal.
+- **`run.sh` preflighted a hardcoded `localhost:3000`** while passing
+  `BELIQ_BASE_URL` through to the container, so the production run this roadmap
+  already contemplated could not get past the preflight. It now probes whatever
+  the base URL names.
+
+`WC tested up to` moves to **11.1** on the strength of this run rather than on the
+surfaces test alone, which checks loading and hooking but not generating.
 
 ## Decisions
 

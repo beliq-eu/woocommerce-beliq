@@ -348,8 +348,23 @@ check($forced !== null && $afterForce !== '' && $afterForce !== $before, 'manual
 // Capability gate on the download entry point.
 WP_CLI::log('');
 WP_CLI::log('== Case: download capability gate ==');
-$adminId = wp_insert_user(['user_login' => 'smoke_admin', 'user_pass' => wp_generate_password(), 'role' => 'administrator']);
-$subId = wp_insert_user(['user_login' => 'smoke_sub', 'user_pass' => wp_generate_password(), 'role' => 'subscriber']);
+// Reuse the user when it is already there: wp_insert_user returns
+// WP_Error('existing_user_login') on a second run against a stack that was not
+// torn down, which failed both checks below for a reason that has nothing to do
+// with capabilities.
+$ensure_user = static function (string $login, string $role): int|\WP_Error {
+    $existing = get_user_by('login', $login);
+    if ($existing instanceof \WP_User) {
+        $existing->set_role($role);
+
+        return $existing->ID;
+    }
+
+    return wp_insert_user(['user_login' => $login, 'user_pass' => wp_generate_password(), 'role' => $role]);
+};
+
+$adminId = $ensure_user('smoke_admin', 'administrator');
+$subId = $ensure_user('smoke_sub', 'subscriber');
 check(!is_wp_error($adminId) && user_can($adminId, 'edit_shop_orders'), 'administrator has the edit_shop_orders capability');
 check(!is_wp_error($subId) && !user_can($subId, 'edit_shop_orders'), 'subscriber lacks the edit_shop_orders capability');
 
