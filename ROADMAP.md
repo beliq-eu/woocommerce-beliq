@@ -1,6 +1,6 @@
 # woocommerce-beliq roadmap
 
-`status: live, next: confirm free-tier signup works, then the operator-gated WordPress.org submission in PASS-3-SMOKE-ROADMAP.md 3.3`
+`status: live, next: the operator-gated WordPress.org submission in PASS-3-SMOKE-ROADMAP.md 3.3; free-tier signup and a live-key generate are proven`
 
 A WooCommerce plugin that turns store orders into compliant EN 16931 e-invoices
 (XRechnung, ZUGFeRD, Factur-X, Peppol BIS) through the beliq API. beliq produces
@@ -198,11 +198,15 @@ Plus the parser's own branches: an error row exits 1, a warning-only array exits
 ## Operator-gated (post-go-live)
 
 - WordPress.org plugin directory submission and manual review, and/or a Packagist
-  listing. The live beliq API this needs for review screenshots and a test store
-  is up: `api.beliq.eu` answers and `dashboard.beliq.eu` serves. What the reviewer
-  path still needs proven is free-tier signup, since the readme promises the free
-  tier is enough to evaluate the plugin.
-- Live-key smoke, which needs only a `BELIQ_API_KEY` against that API.
+  listing. **The reviewer path is proven against production as of 2026-09-07:**
+  card-free signup, automatic Free plan (20 documents a month at 10 requests a
+  minute), and a free-tier live key that generates an XRechnung 3.0 document which
+  re-validates with 0 errors. Evidence in `PASS-3-SMOKE-ROADMAP.md` step 1. So the
+  readme's promise that the free tier is enough to evaluate the plugin holds, and
+  what remains is the operator's wp.org account, the screenshots, and the decision
+  on timing against the public launch announcement.
+- Live-key smoke: the API half is done (see above). Re-running `smoke/` against
+  production is the remaining stronger check, and is not a blocker for submission.
 
 ## Conventions
 
