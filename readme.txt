@@ -1,7 +1,7 @@
 === beliq e-invoicing ===
 Contributors: beliq
 Tags: e-invoicing, xrechnung, zugferd, peppol, factur-x
-Requires at least: 6.4
+Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 8.2
 Stable tag: 0.1.0
