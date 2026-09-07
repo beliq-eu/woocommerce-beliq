@@ -8,6 +8,10 @@ use Beliq\Core\Exception\BeliqApiException;
  * A thin beliq API client. Auth is the X-API-Key header. generate returns the
  * document bytes (XML or PDF) plus header metadata; validate returns the parsed
  * ValidationResult. A non-2xx response is turned into a BeliqApiException.
+ *
+ * The JSON-returning endpoints send `Accept: application/json`; generate sends the
+ * document's own media type, because that header is what selects between the raw
+ * file and a base64 JSON envelope.
  */
 final class BeliqClient
 {
@@ -41,10 +45,21 @@ final class BeliqClient
      */
     public function generate(array $body): array
     {
+        // `Accept` must name the document, not JSON. /v1/generate returns the raw
+        // file by default but switches to a JSON envelope carrying the file
+        // base64-encoded whenever the caller ranks application/json above the
+        // document's own media type. Sending the JSON Accept the other endpoints
+        // need would make every stored invoice that envelope instead.
+        $documentMediaType = ($body['output'] ?? 'xml') === 'pdf' ? 'application/pdf' : 'application/xml';
+
         $res = $this->http->request(
             'POST',
             $this->baseUrl . '/v1/generate',
-            $this->authHeaders(['Content-Type' => 'application/json']),
+            [
+                'X-API-Key' => $this->apiKey,
+                'Accept' => $documentMediaType,
+                'Content-Type' => 'application/json',
+            ],
             json_encode($body, JSON_THROW_ON_ERROR),
         );
         $this->throwIfError($res, 'generate');

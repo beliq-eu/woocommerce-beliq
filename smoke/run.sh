@@ -6,8 +6,13 @@
 # running on the host, and BELIQ_API_KEY is exported (a key valid for the local
 # api). The store reaches the host api through host.docker.internal.
 #
+# BELIQ_BASE_URL points the store at a different api, production included. The
+# store resolves it from inside a container, so the host-side preflight rewrites
+# host.docker.internal back to localhost before probing.
+#
 # Usage:
 #   BELIQ_API_KEY=... ./run.sh          # up, install, run the smoke (leaves the stack up)
+#   BELIQ_API_KEY=... BELIQ_BASE_URL=https://api.beliq.eu ./run.sh
 #   ./run.sh down                       # tear the stack down and wipe volumes
 set -euo pipefail
 
@@ -26,13 +31,14 @@ fi
 export BELIQ_API_KEY
 export BELIQ_BASE_URL="${BELIQ_BASE_URL:-http://host.docker.internal:3000}"
 
-echo "== Preflight: host api reachable =="
-if ! curl -fsS -m 5 http://localhost:3000/health/live >/dev/null; then
-    echo "FAIL: beliq api not reachable at http://localhost:3000/health/live" >&2
-    echo "      Start the engine (:8000) and api (:3000) first (see README.md)." >&2
+echo "== Preflight: api reachable =="
+PREFLIGHT_URL="${BELIQ_BASE_URL/host.docker.internal/localhost}/health/live"
+if ! curl -fsS -m 10 "$PREFLIGHT_URL" >/dev/null; then
+    echo "FAIL: beliq api not reachable at $PREFLIGHT_URL" >&2
+    echo "      For the local default, start the engine (:8000) and api (:3000) first (see README.md)." >&2
     exit 1
 fi
-echo "  ok"
+echo "  ok ($PREFLIGHT_URL)"
 
 echo "== Bringing up the stack =="
 $DC up -d --wait
