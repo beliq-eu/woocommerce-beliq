@@ -1,5 +1,7 @@
 # woocommerce-beliq roadmap
 
+`status: live, next: confirm free-tier signup works, then the operator-gated WordPress.org submission in PASS-3-SMOKE-ROADMAP.md 3.3`
+
 A WooCommerce plugin that turns store orders into compliant EN 16931 e-invoices
 (XRechnung, ZUGFeRD, Factur-X, Peppol BIS) through the beliq API. beliq produces
 and checks the document; transmission, archiving, and tax-authority reporting
@@ -47,10 +49,10 @@ the core-sharing decision below).
    Guideline 17 trademark rejection. Two identities, deliberately.
 6. **The version stays `0.1.0` until the publish pass, which is where `1.0.0` gets
    decided.** Every published beliq connector is 0.x (n8n 0.2.0, activepieces
-   0.2.1, directus 0.2.3, beliq-mcp 0.3.1, beliq-cli 0.2.1, beliq-sevdesk 0.2.1,
-   `@beliq/sdk` 0.3.1, `beliq` on PyPI 0.2.1), and beliq itself has not gone live,
-   so a 1.x plugin would be the only 1.x thing in the portfolio and would claim
-   more than the product does. Nothing is pinned to the number yet: no git tag, no
+   0.2.2, directus 0.2.3, beliq-mcp 0.3.1, beliq-cli 0.2.1, beliq-sevdesk 0.2.2,
+   `@beliq/sdk` 0.3.1, `beliq` on PyPI 0.2.1), and beliq has not made its public
+   launch announcement, so a 1.x plugin would be the only 1.x thing in the
+   portfolio and would claim more than the product does. Nothing is pinned to the number yet: no git tag, no
    wp.org listing, no Packagist listing. The publish pass already reopens the
    version metadata (`Stable tag`, the plugin header, the changelog date), so
    promoting to `1.0.0` there costs the same as now and can be decided against a
@@ -58,7 +60,7 @@ the core-sharing decision below).
 
 ## Passes
 
-### Pass 1: framework-agnostic core + order adapter (this pass)
+### Pass 1: framework-agnostic core + order adapter (done)
 
 - `src/Core/*`: the invoice value objects, `InvoiceMapper` (per-line VAT category
   derivation, `taxSummary` grouping by category+rate, EN 16931 rounding and totals
@@ -128,7 +130,7 @@ PHPUnit and PHPCS run in CI): every file lints clean with `php -l`, and the new
 `WooPluginConfigProviderTest` covers the checkbox coercion and the meta-key mapping
 against plain arrays. The runtime classes are never autoloaded by the offline suite.
 
-### Pass 3: live smoke + store submission
+### Pass 3: live smoke (done) + store submission (operator-gated)
 
 Smoke against a Dockerized WordPress + WooCommerce with the plugin installed and a
 local beliq api/engine: place a B2B order, transition it to the trigger status, and
@@ -196,8 +198,11 @@ Plus the parser's own branches: an error row exits 1, a warning-only array exits
 ## Operator-gated (post-go-live)
 
 - WordPress.org plugin directory submission and manual review, and/or a Packagist
-  listing. Needs a live beliq API for review screenshots and a test store.
-- Live-key smoke once a `BELIQ_API_KEY` and live/staging API exist.
+  listing. The live beliq API this needs for review screenshots and a test store
+  is up: `api.beliq.eu` answers and `dashboard.beliq.eu` serves. What the reviewer
+  path still needs proven is free-tier signup, since the readme promises the free
+  tier is enough to evaluate the plugin.
+- Live-key smoke, which needs only a `BELIQ_API_KEY` against that API.
 
 ## Conventions
 
