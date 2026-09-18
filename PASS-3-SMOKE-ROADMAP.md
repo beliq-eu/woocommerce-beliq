@@ -165,7 +165,7 @@ Then, in order:
    - `WC tested up to: 11.1` against WooCommerce 11.1.1, the current release.
    - `CHANGELOG.md` carries `0.1.0 (2026-09-08)`.
    - `Stable tag: 0.1.0` matches the plugin header `Version: 0.1.0`.
-3. **Build the submission zip. DONE 2026-09-18**, from `3c75063` as
+3. **Build the submission zip. TO REDO after the 3.7 rewording.** First built 2026-09-18 from `3c75063` as
    `tmp/beliq-e-invoicing-0.1.0.zip`, sha256
    `d3becebb59ad03079aaa7541cd40d4305a3aa54a79acf0379e638b1db2c89fb3`. It is
    `git archive HEAD` over the `DIST` set, so it holds only committed files: 28
