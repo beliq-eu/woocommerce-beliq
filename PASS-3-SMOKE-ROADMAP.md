@@ -1,6 +1,6 @@
 # woocommerce-beliq - Pass 3 (live Docker smoke + wp.org submission)
 
-`status: live, next: 3.3, the operator's wp.org submission and SVN publish; the live path and a full production smoke on WooCommerce 11.1 are both green`
+`status: live, next: 3.3 step 4, the operator's wp.org submission and SVN publish; the submission zip is built and Plugin Check is clean on 2026-09-18`
 
 Living roadmap for D8.2 Pass 3. Passes 1 and 2 are merged and green (see
 `ROADMAP.md`). This pass proves the WordPress runtime path end to end against a
@@ -87,7 +87,7 @@ actual SVN commit + review is the operator's (needs a wp.org account).
 Done in-repo:
 - `readme.txt` is wp.org-valid, its `Stable tag: 0.1.0` matches the plugin header
   `Version: 0.1.0`, and it carries the external-services disclosure. `Requires at
-  least 6.4`, `Requires PHP 8.2`.
+  least 6.5`, `Requires PHP 8.2`.
 - The two submission screenshots are captured and named to the wp.org convention
   in `tmp/`: `screenshot-1.png` (the Integrations settings screen, API key masked,
   no editable API base URL) and `screenshot-2.png` (the order "beliq e-invoice"
@@ -95,8 +95,8 @@ Done in-repo:
   be committed; the PNGs go to SVN `/assets`, not the plugin tree.
 - `readme.txt` has a `== Screenshots ==` section whose two captions match that
   file order.
-- Plugin header `WC tested up to` bumped to `10.9` (the smoke ran WooCommerce
-  10.9.1).
+- Plugin header `WC tested up to` is `11.1` (the production smoke in 3.6 ran
+  WooCommerce 11.1.0).
 - Plugin Check is clean (3.4).
 
 **The wp.org slug is `beliq-e-invoicing`, not `woocommerce-beliq`.** wp.org derives
@@ -115,9 +115,9 @@ submission. **That gate is now discharged, proven against production on
 Whether to submit ahead of the public launch announcement is a separate call, and
 it is the operator's.
 
-Can be done at any time:
-- Merge the in-repo prep (this pass).
-- Register a WordPress.org account for the submitter, if there isn't one.
+Already done:
+- The in-repo prep (this pass) is merged.
+- The submitter's WordPress.org account is `@beliq`, matching `Contributors: beliq`.
 
 Then, in order:
 
@@ -152,25 +152,26 @@ Then, in order:
    this also re-confirms against production the "Verified against POST
    /v1/generate" comment in `tools/zapier-beliq/src/creates/generateInvoice.ts`.
 
-   Account: `wporg-test@beliq.eu`, org slug `wporg-reviewer-test-51a6a3`. It is a
-   disposable evaluation org and should be deleted once the submission is through;
-   Free allows one owned org per account, so the address is spent until then.
+   Account: `wporg-test@beliq.eu`, org slug `wporg-reviewer-test-51a6a3`, a
+   disposable evaluation org. Deleted 2026-09-19, together with its API key.
 
-   What this does **not** cover: the full order-to-invoice path through WordPress
-   against production. 3.2 proved that against a local api + engine built from the
-   same `main`. Re-running `smoke/run.sh` pointed at `api.beliq.eu` is the stronger
-   check and is still available; it costs roughly 8 to 10 of the 20 monthly free
-   documents.
-2. **Finalize version metadata in `readme.txt`.**
-   - `Tested up to`: sits at `7.1`. Re-check it at submission (wp.org compares it
-     against whatever it calls current on the day) by running `plugin-check/run.sh`,
-     which fails on `outdated_tested_upto_header`.
-   - `WC tested up to` in `woocommerce-beliq.php` is `10.9`; nudge it if WooCommerce
-     has moved on by then.
-   - Flip `CHANGELOG.md` `0.1.0 (unreleased)` to the release date.
-   - Keep `Stable tag: 0.1.0` matching the plugin header `Version`.
-3. **Build the submission zip** (plugin runtime only, self-contained autoloader, no
-   Composer install needed):
+   This step alone does not cover the full order-to-invoice path through WordPress
+   against production. 3.6 covers it: `smoke/run.sh` pointed at `api.beliq.eu`.
+2. **Finalize version metadata. DONE 2026-09-18.**
+   - `Tested up to: 7.1` against WordPress 7.1.1, the current release. The full
+     `plugin-check/run.sh` run (without `--ignore-calendar`, so
+     `outdated_tested_upto_header` is checked) reported 0 errors and 0 warnings on
+     2026-09-18 with Plugin Check 2.1.0.
+   - `WC tested up to: 11.1` against WooCommerce 11.1.1, the current release.
+   - `CHANGELOG.md` carries `0.1.0 (2026-09-08)`.
+   - `Stable tag: 0.1.0` matches the plugin header `Version: 0.1.0`.
+3. **Build the submission zip. DONE 2026-09-18**, from `3c75063` as
+   `tmp/beliq-e-invoicing-0.1.0.zip`, sha256
+   `d3becebb59ad03079aaa7541cd40d4305a3aa54a79acf0379e638b1db2c89fb3`. It is
+   `git archive HEAD` over the `DIST` set, so it holds only committed files: 28
+   files, no dotfiles, and all 25 PHP files pass `php -l`. A later commit that
+   changes only files outside `DIST` does not make it stale. Plugin runtime only,
+   self-contained autoloader, no Composer install needed:
    - Include: `woocommerce-beliq.php`, `src/`, `languages/`, `readme.txt`, `LICENSE`.
      This is the `DIST` array in `plugin-check/run.sh`, which stages exactly that set.
    - Exclude: `tests/`, `smoke/`, `plugin-check/`, `tmp/`, `.github/`, `phpunit.xml`,
@@ -261,10 +262,9 @@ and both admin-post endpoints carry **this plugin's** callbacks, HPOS compatibil
 declared, and the text domain matches the slug. Ten checks, all green; with the plugin
 deactivated eight of them fail, so the script is not vacuously passing.
 
-That covers loading and hooking, not generating. The full order-to-invoice smoke is
-still pinned to what `smoke/` ran, which is why `WC tested up to` stays at `10.9`
-rather than following WooCommerce to 11.0.1: bumping it honestly needs the smoke
-re-run, and that needs a beliq API key.
+That covers loading and hooking, not generating. `WC tested up to` follows the full
+order-to-invoice smoke instead, so it moved to `11.1` only when 3.6 re-ran that smoke
+against production on WooCommerce 11.1.0.
 
 ### 3.5 - The gate runs in CI and weekly (DONE)
 
