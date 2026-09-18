@@ -36,6 +36,6 @@
   "scripts": {
     "test": "phpunit",
     "phpcs": "phpcs -q",
-    "scrub:check": "! grep -rnP '\\x{2014}' woocommerce-beliq.php src tests languages README.md CHANGELOG.md ROADMAP.md readme.txt"
+    "scrub:check": "bash scripts/scrub-check.sh"
   }
 }
