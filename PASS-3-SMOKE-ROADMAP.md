@@ -1,6 +1,6 @@
 # woocommerce-beliq - Pass 3 (live Docker smoke + wp.org submission)
 
-`status: live, next: 3.3 step 4, the operator's wp.org submission and SVN publish; the submission zip is built and Plugin Check is clean on 2026-09-18`
+`status: live, next: reword the "compliant" claims guideline 9 flags (3.7), rebuild the zip, then 3.3 step 4, the operator's wp.org submission`
 
 Living roadmap for D8.2 Pass 3. Passes 1 and 2 are merged and green (see
 `ROADMAP.md`). This pass proves the WordPress runtime path end to end against a
@@ -178,11 +178,18 @@ Then, in order:
      `phpcs.xml`, `composer.json`/`composer.lock`, `ROADMAP.md`,
      `PASS-3-SMOKE-ROADMAP.md`, `.git/`, `vendor/`.
    - The ZIP's top-level directory must be `beliq-e-invoicing`.
+
+   **This zip still says "compliant", which guideline 9 flags (3.7).** The wording
+   has to change before upload, and the zip has to be rebuilt after that. The
+   sha256 above then no longer names the zip to submit.
 4. **Submit for review** at `https://wordpress.org/plugins/developers/add/`, which
    bounces through `https://login.wordpress.org/` if you are not signed in (checked
-   2026-09-03). Manual review, stated turnaround 1 to 10 days with a 5-business-day
-   target. No company, no fee. Wait for the review email; a
-   human checks the code and the external-service disclosure.
+   2026-09-03). No company, no fee. Per the developer FAQ (read 2026-09-19), every
+   submission gets an initial review within four weeks. A small plugin with correct
+   code is approved within fourteen days of that review. The slug is not shown
+   before upload: the confirmation email names it, and it can be changed once
+   after submitting. The zip can also be replaced from the submission page until
+   the review starts.
 5. **On approval, SVN publish.** Check out the assigned repo
    (`https://plugins.svn.wordpress.org/beliq-e-invoicing/`):
    - Put the plugin files in `/trunk`.
@@ -324,6 +331,66 @@ Two harness defects the run also exposed, both now fixed:
 
 `WC tested up to` moves to **11.1** on the strength of this run rather than on the
 surfaces test alone, which checks loading and hooking but not generating.
+
+### 3.7 - Audit against the wp.org submission docs (2026-09-19, one item open)
+
+We read the three documents the submission page points to and checked the
+distribution against each: the
+[developer FAQ](https://developer.wordpress.org/plugins/wordpress-org/plugin-developer-faq/),
+the [detailed guidelines](https://developer.wordpress.org/plugins/wordpress-org/detailed-plugin-guidelines/)
+(last updated 2026-03-11), and the [Plugin Check](https://wordpress.org/plugins/plugin-check/)
+page. We also read the
+[Compliance Disclaimers](https://developer.wordpress.org/plugins/wordpress-org/compliance-disclaimers/)
+page, which the guidelines link and which spells out guideline 9.
+
+**Open: guideline 9, "implying that a plugin can create, provide, automate, or
+guarantee legal compliance".** The Compliance Disclaimers page asks for the
+readme, the descriptions and the assets (screenshots included) to say the plugin
+*assists* with compliance. It also asks for a note that no plugin can guarantee
+compliance. For a service it asks the readme to say the service carries the
+claim, with a dated link to the evidence. Reviewers warn first, then close the
+plugin after 60 days. "compliant" appears in six shipped places:
+
+- `readme.txt`: the short description, the first Description paragraph, and the
+  External services paragraph.
+- The `Description:` header in `woocommerce-beliq.php`.
+- The settings screen description in `src/Integration/InvoiceIntegration.php`.
+- The order metabox text in `src/Admin/OrderMetabox.php` ("A compliant e-invoice
+  is stored for this order."), plus both strings in
+  `languages/beliq-e-invoicing.pot`.
+
+Both screenshots show one of those strings, so they need re-capturing after the
+change. The readme also names the settings tab "Integrations", while the
+screenshot shows "Integration".
+
+**Passed, with the evidence:**
+
+| Item | Evidence |
+|---|---|
+| G1 GPL-compatible | MIT (Expat) is on the GNU compatible list; `LICENSE` ships in the zip. |
+| G4 readable, source available | No build step or minified code; the zip carries the source. |
+| G5 no trialware | No code path is locked. The 20-document free quota is the service's, which G6 permits. |
+| G6 SaaS documented | `== External services ==` names the service, the data sent and when, plus Terms and Privacy links. |
+| G7 no calls without consent | `wp_remote_request` is only reached from `InvoiceGenerator::generate`, which runs on the configured status or a manual action, after an API key is entered. |
+| G8, G13 no remote code, no bundled core libraries | No enqueued scripts or styles at all; the only bundle is our own autoloader. TLS verification is left on and `redirection` is 0. |
+| G10 no front-end credits | No front-end hook: every hook is admin-side, the order status change, or `admin_post`. |
+| G11 no dashboard hijack | The generation notice is one-shot, per user and dismissible. The missing-WooCommerce notice goes away once WooCommerce is active, and `Requires Plugins` normally prevents that state. |
+| G12 readme not spam | 5 tags, the limit. |
+| G17 name | "beliq e-invoicing" starts with our own brand. The FAQ says ownership is judged by the submitting account's email, so it must be an `@beliq.eu` address that does not auto-reply or feed a helpdesk. |
+| FAQ: under 10 MB, installable, no dev files | 38,519 bytes, `beliq-e-invoicing/` top-level, `DIST` only. |
+| FAQ: tested with `WP_DEBUG` | 2026-09-19 on WordPress 7.1.1 + WooCommerce 11.1.1: plugin load, settings screen render, metabox render, and a status change that ran generation into a dead URL. Zero notices, warnings or deprecations. A planted `E_USER_NOTICE` reached `debug.log`, so the silence is real. |
+| Plugin Check, runtime checks included | `wp plugin check --include-experimental --require=.../plugin-check/cli.php` with WooCommerce active: no errors. `list-checks` confirms the runtime checks load with that flag. |
+
+## Parked / out of scope
+
+- **`plugin-check/run.sh` runs static checks only.** Plugin Check's own docs say
+  WP-CLI needs `--require=<plugin-check>/cli.php` for its runtime checks, and
+  those activate the plugin, which needs WooCommerce present. 3.7 ran them by
+  hand once. Wiring it in means the gate installs WooCommerce first. Small; it
+  blocks nothing today because the plugin enqueues no assets.
+- **No harness turns on `WP_DEBUG`.** `plugin-check/` and `smoke/` both run with
+  it off, so a notice introduced later would go unseen. Small: `wp config set
+  WP_DEBUG true --raw` plus a `debug.log` assertion in `smoke/run.sh`.
 
 ## Decisions
 
