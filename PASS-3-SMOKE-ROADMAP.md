@@ -1,6 +1,6 @@
 # woocommerce-beliq - Pass 3 (live Docker smoke + wp.org submission)
 
-`status: live, next: reword the "compliant" claims guideline 9 flags (3.7), rebuild the zip, then 3.3 step 4, the operator's wp.org submission`
+`status: live, next: 3.3 step 4, the operator uploads the zip rebuilt after the guideline 9 rewording; both screenshots need re-capturing before the SVN publish in step 5`
 
 Living roadmap for D8.2 Pass 3. Passes 1 and 2 are merged and green (see
 `ROADMAP.md`). This pass proves the WordPress runtime path end to end against a
@@ -165,11 +165,14 @@ Then, in order:
    - `WC tested up to: 11.1` against WooCommerce 11.1.1, the current release.
    - `CHANGELOG.md` carries `0.1.0 (2026-09-08)`.
    - `Stable tag: 0.1.0` matches the plugin header `Version: 0.1.0`.
-3. **Build the submission zip. TO REDO after the 3.7 rewording.** First built 2026-09-18 from `3c75063` as
-   `tmp/beliq-e-invoicing-0.1.0.zip`, sha256
-   `d3becebb59ad03079aaa7541cd40d4305a3aa54a79acf0379e638b1db2c89fb3`. It is
-   `git archive HEAD` over the `DIST` set, so it holds only committed files: 28
-   files, no dotfiles, and all 25 PHP files pass `php -l`. A later commit that
+3. **Build the submission zip. DONE 2026-09-19**, rebuilt after the 3.7 rewording
+   from `60b5dee` as `tmp/beliq-e-invoicing-0.1.0.zip`, sha256
+   `c16aa5fcf2aa79e53ff906dcb8ce66b4c70947dc39bf24b771b5018dd8d472c6`, 38,656
+   bytes. It replaces the 2026-09-18 build from `3c75063`, which still said
+   "compliant". It is `git archive HEAD` over the `DIST` set, so it holds only
+   committed files: 28 files, no dotfiles, and all 25 PHP files pass `php -l`.
+   The full `plugin-check/run.sh` run on that tree reported 0 errors and 0
+   warnings on 2026-09-19 (WordPress 7.1.1). A later commit that
    changes only files outside `DIST` does not make it stale. Plugin runtime only,
    self-contained autoloader, no Composer install needed:
    - Include: `woocommerce-beliq.php`, `src/`, `languages/`, `readme.txt`, `LICENSE`.
@@ -178,10 +181,6 @@ Then, in order:
      `phpcs.xml`, `composer.json`/`composer.lock`, `ROADMAP.md`,
      `PASS-3-SMOKE-ROADMAP.md`, `.git/`, `vendor/`.
    - The ZIP's top-level directory must be `beliq-e-invoicing`.
-
-   **This zip still says "compliant", which guideline 9 flags (3.7).** The wording
-   has to change before upload, and the zip has to be rebuilt after that. The
-   sha256 above then no longer names the zip to submit.
 4. **Submit for review** at `https://wordpress.org/plugins/developers/add/`, which
    bounces through `https://login.wordpress.org/` if you are not signed in (checked
    2026-09-03). No company, no fee. Per the developer FAQ (read 2026-09-19), every
@@ -193,8 +192,12 @@ Then, in order:
 5. **On approval, SVN publish.** Check out the assigned repo
    (`https://plugins.svn.wordpress.org/beliq-e-invoicing/`):
    - Put the plugin files in `/trunk`.
-   - Put `screenshot-1.png` + `screenshot-2.png` (from `tmp/`) in `/assets`, plus an
-     icon/banner if desired. Assets live in `/assets`, never in `/trunk`.
+   - Put `screenshot-1.png` + `screenshot-2.png` in `/assets`, plus an icon/banner
+     if desired. Assets live in `/assets`, never in `/trunk`. **Re-capture both
+     first:** the copies in `tmp/` show the pre-3.7 wording (the settings
+     description and "A compliant e-invoice is stored for this order."), which the
+     Compliance Disclaimers page counts as a claim too. `screenshot-2.png` needs a
+     stored invoice, so it needs the `smoke/` stack and an API key.
    - `svn copy trunk tags/0.1.0`, confirm `Stable tag: 0.1.0`, then `svn commit`.
 6. **Verify the live listing.** Screenshots and description render; a fresh install
    against production `api.beliq.eu` generates a green invoice end to end.
@@ -332,7 +335,7 @@ Two harness defects the run also exposed, both now fixed:
 `WC tested up to` moves to **11.1** on the strength of this run rather than on the
 surfaces test alone, which checks loading and hooking but not generating.
 
-### 3.7 - Audit against the wp.org submission docs (2026-09-19, one item open)
+### 3.7 - Audit against the wp.org submission docs (2026-09-19, wording fixed; screenshots due before step 5)
 
 We read the three documents the submission page points to and checked the
 distribution against each: the
@@ -343,8 +346,8 @@ page. We also read the
 [Compliance Disclaimers](https://developer.wordpress.org/plugins/wordpress-org/compliance-disclaimers/)
 page, which the guidelines link and which spells out guideline 9.
 
-**Open: guideline 9, "implying that a plugin can create, provide, automate, or
-guarantee legal compliance".** The Compliance Disclaimers page asks for the
+**Fixed 2026-09-19: guideline 9, "implying that a plugin can create, provide,
+automate, or guarantee legal compliance".** The Compliance Disclaimers page asks for the
 readme, the descriptions and the assets (screenshots included) to say the plugin
 *assists* with compliance. It also asks for a note that no plugin can guarantee
 compliance. For a service it asks the readme to say the service carries the
@@ -359,9 +362,14 @@ plugin after 60 days. "compliant" appears in six shipped places:
   is stored for this order."), plus both strings in
   `languages/beliq-e-invoicing.pot`.
 
-Both screenshots show one of those strings, so they need re-capturing after the
-change. The readme also names the settings tab "Integrations", while the
-screenshot shows "Integration".
+The fix (`60b5dee`) drops the word from all six, plus the GitHub `README.md` and
+`composer.json`. The metabox now says "A validated e-invoice is stored for this
+order." The readme gains a paragraph saying no plugin can guarantee legal
+compliance, and it links
+https://docs.beliq.eu/compliance/validation-artifacts/ as the service's dated
+evidence: that page lists the rule sets in production with their versions and
+dates. The readme's "Integrations" tab name is now "Integration", as the screen
+shows it. Both screenshots still show the old strings; step 5 re-captures them.
 
 **Passed, with the evidence:**
 
