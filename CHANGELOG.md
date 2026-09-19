@@ -2,6 +2,7 @@
 
 ## 0.1.0 (2026-09-08)
 
+- The readme and the admin screens no longer call the output "compliant". The readme says the plugin helps with e-invoicing obligations but cannot guarantee legal compliance, as WordPress.org plugin guideline 9 requires, and links the dated list of rule sets beliq validates against.
 - Totals sum the line nets as emitted. Each line net is rounded once and every sum is taken over the rounded values, so the invoice's line total (BT-106) and each VAT group's taxable amount equal the sum of the lines (BR-CO-10, BR-S-08). WooCommerce stores line nets past two decimals, and rounding their unrounded sum instead could land a cent away, which the validator rejects.
 - `/v1/generate` is asked for the document's own media type. The endpoint returns the raw file by default but switches to a JSON envelope carrying the file base64-encoded as soon as the caller ranks `application/json` above the document type, so sharing the `Accept` header the JSON endpoints need would store that envelope in place of every invoice.
 - Verified end to end against production `api.beliq.eu` on WooCommerce 11.1: 38 of 38 smoke checks, covering German XRechnung, French Peppol BIS, and German ZUGFeRD (hybrid PDF).

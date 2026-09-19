@@ -5,7 +5,7 @@ namespace Beliq\WooCommerce\Integration;
 use WC_Integration;
 
 /**
- * The beliq settings screen, shown under WooCommerce > Settings > Integrations.
+ * The beliq settings screen, shown under WooCommerce > Settings > Integration.
  * It collects the beliq connection, the seller legal details, the payment
  * account, the generation options, and the two WooCommerce-only meta-key
  * mappings (buyer VAT id, buyer reference). WooCommerce persists the values under
@@ -21,7 +21,7 @@ class InvoiceIntegration extends WC_Integration
         $this->id = 'beliq';
         $this->method_title = __('beliq e-invoicing', 'beliq-e-invoicing');
         $this->method_description = __(
-            'Generate compliant EN 16931 e-invoices (XRechnung, ZUGFeRD, Factur-X, Peppol BIS) from your orders through the beliq API. beliq generates and validates the document; sending, archiving, and filing stay with you.',
+            'Generate EN 16931 e-invoices (XRechnung, ZUGFeRD, Factur-X, Peppol BIS) from your orders through the beliq API. beliq generates and validates the document; sending, archiving, and filing stay with you.',
             'beliq-e-invoicing',
         );
 

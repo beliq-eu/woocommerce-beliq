@@ -10,7 +10,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Domain: beliq-e-invoicing\n"
 
-msgid "A compliant e-invoice is stored for this order."
+msgid "A validated e-invoice is stored for this order."
 msgstr ""
 
 msgid "API key"
@@ -85,7 +85,7 @@ msgstr ""
 msgid "Generate beliq e-invoice"
 msgstr ""
 
-msgid "Generate compliant EN 16931 e-invoices (XRechnung, ZUGFeRD, Factur-X, Peppol BIS) from your orders through the beliq API. beliq generates and validates the document; sending, archiving, and filing stay with you."
+msgid "Generate EN 16931 e-invoices (XRechnung, ZUGFeRD, Factur-X, Peppol BIS) from your orders through the beliq API. beliq generates and validates the document; sending, archiving, and filing stay with you."
 msgstr ""
 
 msgid "Generate invoices automatically"
