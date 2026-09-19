@@ -12,7 +12,7 @@ use Beliq\WooCommerce\Order\WooOrderAdapter;
 use WC_Order;
 
 /**
- * Turns a WooCommerce order into a stored, compliant document. It is the single
+ * Turns a WooCommerce order into a stored, validated document. It is the single
  * place the runtime calls to produce an invoice: it maps the order, applies the
  * business-only gate, calls the beliq API, and hands the bytes to the
  * DocumentStore. It does not send, file, or transmit anything.

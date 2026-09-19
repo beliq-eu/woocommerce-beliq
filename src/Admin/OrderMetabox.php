@@ -57,7 +57,7 @@ final class OrderMetabox
 
         if ($hasDocument) {
             $generatedAt = $this->store->generatedAt($order);
-            echo '<p>' . esc_html__('A compliant e-invoice is stored for this order.', 'beliq-e-invoicing') . '</p>';
+            echo '<p>' . esc_html__('A validated e-invoice is stored for this order.', 'beliq-e-invoicing') . '</p>';
             if ($generatedAt !== null) {
                 echo '<p><small>' . esc_html(sprintf(
                     /* translators: %s: generation timestamp */

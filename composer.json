@@ -1,6 +1,6 @@
 {
   "name": "beliq/woocommerce-beliq",
-  "description": "Generate compliant EN 16931 e-invoices from WooCommerce orders through the beliq API.",
+  "description": "Generate EN 16931 e-invoices from WooCommerce orders through the beliq API.",
   "type": "wordpress-plugin",
   "license": "MIT",
   "authors": [

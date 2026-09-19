@@ -8,13 +8,15 @@ Stable tag: 0.1.0
 License: MIT
 License URI: https://opensource.org/licenses/MIT
 
-Generate compliant EN 16931 e-invoices (XRechnung, ZUGFeRD, Factur-X, Peppol BIS) from WooCommerce orders through the beliq API.
+Generate EN 16931 e-invoices (XRechnung, ZUGFeRD, Factur-X, Peppol BIS) from WooCommerce orders through the beliq API.
 
 == Description ==
 
-beliq e-invoicing turns a WooCommerce order into a structured, EN 16931 compliant electronic invoice using the beliq API. When an order reaches the status you choose, the plugin maps the order onto invoice semantics, calls beliq to produce the document, validates it against the business rules, and stores it with the order for download.
+beliq e-invoicing turns a WooCommerce order into a structured EN 16931 electronic invoice using the beliq API. When an order reaches the status you choose, the plugin maps the order onto invoice semantics, calls beliq to produce the document, validates it against the business rules, and stores it with the order for download.
 
 The plugin generates and validates the document. It does not send, file, transmit, or archive it: Peppol transmission, e-mail delivery, and tax-authority reporting stay with you.
+
+beliq validates every document against the EN 16931 business rules and the rules of the chosen format before it returns it. That helps you meet e-invoicing obligations, but no plugin can guarantee legal compliance: whether your invoices meet the rules that apply to your business stays your responsibility. The rule sets beliq validates against, with their versions and dates, are listed at https://docs.beliq.eu/compliance/validation-artifacts/.
 
 Supported output formats:
 
@@ -35,7 +37,7 @@ A beliq API key is required. The free tier is enough to evaluate the plugin.
 
 == External services ==
 
-This plugin connects to the beliq API at https://api.beliq.eu, a third-party service operated by beliq, to generate and validate your e-invoices. The plugin cannot produce a compliant document without it.
+This plugin connects to the beliq API at https://api.beliq.eu, a third-party service operated by beliq, to generate and validate your e-invoices. The plugin cannot produce a document without it.
 
 When an invoice is generated (automatically when an order reaches the status you configure, or manually from the order screen), the plugin sends that order's invoice data to the beliq API: the seller details you configure, the buyer's billing details and VAT ID, the order line items, and the amounts and taxes. The request is authenticated with your beliq API key. beliq returns the generated document, which the plugin stores with the order. No data is sent to beliq at any other time, and nothing is sent to any other service.
 
@@ -45,7 +47,7 @@ For how beliq handles this data, see the beliq Terms of Service at https://beliq
 
 1. Install and activate WooCommerce.
 2. Upload the plugin to wp-content/plugins and activate it, or install it from the plugin directory.
-3. Go to WooCommerce > Settings > Integrations > beliq e-invoicing.
+3. Go to WooCommerce > Settings > Integration > beliq e-invoicing.
 4. Enter your beliq API key and your seller legal details.
 5. Choose the document format and the order status that generation runs on, then enable automatic generation.
 
@@ -69,7 +71,7 @@ In a protected subdirectory of your WordPress uploads folder. It is served only 
 
 == Screenshots ==
 
-1. The beliq integration settings under WooCommerce > Settings > Integrations: the API key, seller legal details, payment account, and invoice generation options.
+1. The beliq integration settings under WooCommerce > Settings > Integration: the API key, seller legal details, payment account, and invoice generation options.
 2. The beliq e-invoice box on the order screen (highlighted), showing the generation status and a capability-checked download.
 
 == Changelog ==
