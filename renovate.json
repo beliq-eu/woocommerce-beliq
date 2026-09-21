@@ -1,4 +1,16 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["local>beliq-eu/.github:automerge"]
+  "extends": ["local>beliq-eu/.github:automerge"],
+  "packageRules": [
+    {
+      "description": "phpunit 13 requires PHP >= 8.4.1. This repo declares `php: >=8.2` and runs its test matrix on 8.2, 8.3 and 8.4, because WordPress and WooCommerce support all three and the plugin has to run wherever the shop does. A phpunit 13 update therefore cannot resolve on the 8.2 and 8.3 legs and the pull request can never go green (https://github.com/beliq-eu/woocommerce-beliq/pull/15). The PHP floor is a per-repository fact, so this hold lives here rather than in the shared beliq-eu/.github preset. Lift it when this repo's lowest supported PHP is 8.4.1 or higher, which means dropping WordPress 8.2 and 8.3 support first.",
+      "matchPackageNames": ["phpunit/phpunit"],
+      "allowedVersions": "<13.0.0"
+    },
+    {
+      "description": "php_codesniffer 4 conflicts with wp-coding-standards/wpcs, which this repo requires at ^3.1 to lint against the WordPress coding standards. wpcs 3.4.1, its newest release as of 2026-09-21, still requires `squizlabs/php_codesniffer ^3.13.5`, so composer refuses the pair and the update can never go green (https://github.com/beliq-eu/woocommerce-beliq/pull/16). Not a PHP version problem: it is an upstream support gap in wpcs. Lift when wpcs ships a release accepting php_codesniffer 4; https://github.com/WordPress/WordPress-Coding-Standards/issues/2622 asks for it and https://github.com/WordPress/WordPress-Coding-Standards/issues/2607 is the maintainers' plan for dropping 3.x. Raising the wpcs floor in composer.json is what unblocks this, not editing this rule.",
+      "matchPackageNames": ["squizlabs/php_codesniffer"],
+      "allowedVersions": "<4.0.0"
+    }
+  ]
 }
