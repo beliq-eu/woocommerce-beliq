@@ -18,6 +18,9 @@
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0"
   },
   "config": {
+    "platform": {
+      "php": "8.2.0"
+    },
     "allow-plugins": {
       "dealerdirect/phpcodesniffer-composer-installer": true
     }
@@ -36,6 +39,7 @@
   "scripts": {
     "test": "phpunit",
     "phpcs": "phpcs -q",
-    "scrub:check": "bash scripts/scrub-check.sh"
+    "scrub:check": "bash scripts/scrub-check.sh",
+    "archive:check": "bash scripts/archive-check.sh"
   }
 }

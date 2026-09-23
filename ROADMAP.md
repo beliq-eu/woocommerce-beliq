@@ -1,6 +1,6 @@
 # woocommerce-beliq roadmap
 
-`status: live, next: the operator-gated WordPress.org submission in PASS-3-SMOKE-ROADMAP.md 3.3; free-tier signup and a live-key generate are proven`
+`status: live, next: the operator-gated WordPress.org submission in PASS-3-SMOKE-ROADMAP.md 3.3 and a Packagist listing (decided 2026-09-21; the repo is untagged at 0.1.0); free-tier signup and a live-key generate are proven`
 
 A WooCommerce plugin that turns store orders into compliant EN 16931 e-invoices
 (XRechnung, ZUGFeRD, Factur-X, Peppol BIS) through the beliq API. beliq produces
@@ -197,8 +197,17 @@ Plus the parser's own branches: an error row exits 1, a warning-only array exits
 
 ## Operator-gated (post-go-live)
 
-- WordPress.org plugin directory submission and manual review, and/or a Packagist
-  listing. **The reviewer path is proven against production as of 2026-09-07:**
+- **Both channels, decided 2026-09-21:** a Packagist listing as
+  `beliq/woocommerce-beliq`, and the WordPress.org plugin directory submission and
+  manual review as planned in `PASS-3-SMOKE-ROADMAP.md` 3.3. The decision was
+  "Packagist first for both PHP plugins, Shopware Store later"; wp.org is free and
+  self-serve, so this plugin has no store fee to weigh and goes there as planned.
+  **The decision does not settle the version.** Packagist derives versions from
+  git tags, this repo has none, and tagging is its own step under locked decision 6.
+  A Packagist install downloads `git archive` of the tagged commit, which
+  `.gitattributes` limits to the wp.org distribution plus `composer.json`,
+  `README.md` and `CHANGELOG.md`; `scripts/archive-check.sh` enforces that in CI.
+  **The reviewer path is proven against production as of 2026-09-07:**
   card-free signup, automatic Free plan (20 documents a month at 10 requests a
   minute), and a free-tier live key that generates an XRechnung 3.0 document which
   re-validates with 0 errors. Evidence in `PASS-3-SMOKE-ROADMAP.md` step 1. So the

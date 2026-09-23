@@ -28,6 +28,8 @@ jobs:
         run: composer test
       - name: Scrub check (no em-dash)
         run: composer scrub:check
+      - name: Archive check (what a Packagist install ships)
+        run: composer archive:check
 
   # The wp.org submission gate. Plugin Check is installed from wordpress.org on
   # every run, so this tracks the rules wp.org actually enforces rather than a
