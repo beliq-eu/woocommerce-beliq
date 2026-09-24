@@ -53,9 +53,9 @@ For how beliq handles this data, see the beliq Terms of Service at https://beliq
 
 == Frequently Asked Questions ==
 
-= Does this send my invoices anywhere? =
+= Does this send my invoices to my customers? =
 
-No. The plugin generates and validates the document and stores it with the order. Sending, filing, and archiving stay with you.
+No. The plugin sends the order's invoice data to the beliq API to generate and validate the document (see External services), and stores the returned document with the order. Delivering it to your customer, filing, and archiving stay with you.
 
 = Do I need a beliq account? =
 
