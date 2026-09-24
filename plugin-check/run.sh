@@ -20,7 +20,9 @@ cd "$(dirname "$0")"
 SLUG="beliq-e-invoicing"
 
 # What goes into the submitted ZIP and the SVN trunk. Everything else in the
-# repo is development-only. Keep this list in step with any new shipped path.
+# repo is development-only. Keep this list in step with any new shipped path,
+# and with the export-ignore allowlist in .gitattributes (what Packagist ships);
+# scripts/archive-check.sh fails CI when those two disagree.
 DIST=(woocommerce-beliq.php src languages readme.txt LICENSE)
 
 # The codes whose input is the calendar rather than this repo:

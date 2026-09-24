@@ -1,6 +1,6 @@
 # woocommerce-beliq - Pass 3 (live Docker smoke + wp.org submission)
 
-`status: live, next: 3.3 step 4, the operator uploads the zip rebuilt after the guideline 9 rewording; both screenshots need re-capturing before the SVN publish in step 5`
+`status: live, next: 3.3 step 4, the operator uploads the zip rebuilt after the guideline 9 rewording (rebuilt again first if the item 8f SourceOrder.php docblock change has merged); both screenshots need re-capturing before the SVN publish in step 5`
 
 Living roadmap for D8.2 Pass 3. Passes 1 and 2 are merged and green (see
 `ROADMAP.md`). This pass proves the WordPress runtime path end to end against a
@@ -173,7 +173,11 @@ Then, in order:
    committed files: 28 files, no dotfiles, and all 25 PHP files pass `php -l`.
    The full `plugin-check/run.sh` run on that tree reported 0 errors and 0
    warnings on 2026-09-19 (WordPress 7.1.1). A later commit that
-   changes only files outside `DIST` does not make it stale. Plugin runtime only,
+   changes only files outside `DIST` does not make it stale. **The item 8f
+   change (branch `item-8f`, opened 2026-09-24) does make it stale once merged:**
+   it rewrites the docblock of `src/Core/Invoice/SourceOrder.php`, which is in
+   `DIST`. Uploading this zip before that merge is fine; after it, rebuild from
+   the merge commit and record the new sha256 and size here. Plugin runtime only,
    self-contained autoloader, no Composer install needed:
    - Include: `woocommerce-beliq.php`, `src/`, `languages/`, `readme.txt`, `LICENSE`.
      This is the `DIST` array in `plugin-check/run.sh`, which stages exactly that set.

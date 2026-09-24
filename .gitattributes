@@ -1,0 +1,17 @@
+# A Composer install from Packagist downloads GitHub's archive of the tagged
+# commit, which is `git archive` and honours export-ignore. Everything at the
+# top level stays out of that archive unless it is listed below, so a new
+# development file or directory is excluded without anyone having to remember.
+#
+# The allowed set is the wp.org distribution (the DIST array in
+# plugin-check/run.sh) plus composer.json, README.md and CHANGELOG.md.
+# scripts/archive-check.sh fails CI when the two drift apart.
+/* export-ignore
+/woocommerce-beliq.php -export-ignore
+/src -export-ignore
+/languages -export-ignore
+/readme.txt -export-ignore
+/LICENSE -export-ignore
+/composer.json -export-ignore
+/README.md -export-ignore
+/CHANGELOG.md -export-ignore

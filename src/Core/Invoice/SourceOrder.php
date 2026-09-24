@@ -4,8 +4,9 @@ namespace Beliq\Core\Invoice;
 
 /**
  * A store order normalized to what EN 16931 needs, independent of any platform.
- * The Shopware adapter fills this from an OrderEntity; the mapper turns it into
- * a beliq generate body. dueDate, issueDate are ISO dates (YYYY-MM-DD).
+ * WooOrderAdapter fills this from a WooCommerce order, read through the
+ * OrderData seam; the mapper turns it into a beliq generate body. dueDate,
+ * issueDate are ISO dates (YYYY-MM-DD).
  *
  * zeroRateCategory is the VAT category used for lines taxed at 0%. It defaults to
  * Z (zero-rated). The merchant owns this choice; see ROADMAP.md on why reverse
