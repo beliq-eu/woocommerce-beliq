@@ -111,7 +111,7 @@ final class WooOrderAdapter
      * The buyer reference (BT-10). A merchant routing to a public administration
      * carries the buyer's Leitweg-ID in an order meta field; a plain commercial
      * order falls back to the buyer's customer reference, then to the order
-     * number, so the field is always present (BR-DE-1).
+     * number, so the field is always present (BR-DE-15).
      */
     private function buyerReference(OrderData $order, string $orderNumber): string
     {
