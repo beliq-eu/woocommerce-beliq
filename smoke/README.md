@@ -1,7 +1,7 @@
-# Pass 3 live smoke (Dockerized WordPress + WooCommerce)
+# Live smoke (Dockerized WordPress + WooCommerce)
 
 Boots a real WordPress + WooCommerce store with the plugin installed and drives a
-B2B order through the full runtime path against a local beliq api + engine:
+B2B order through the full runtime path against a beliq API:
 
 ```
 woocommerce_order_status_changed -> OrderStatusTrigger -> WcOrderData
@@ -15,37 +15,19 @@ and is capability-gated. It also covers the business-only skip and auto-vs-manua
 idempotency. Cases: German XRechnung (xml), French Peppol BIS (xml), German
 ZUGFeRD (hybrid pdf).
 
-## Prerequisites: a local beliq api + engine
+## Prerequisites: a beliq API and a key for it
 
-The store reaches the host api at `host.docker.internal:3000`; the api reaches the
-engine at `localhost:8000`.
+`BELIQ_BASE_URL` names the API the store calls, and `BELIQ_API_KEY` is a key that API
+accepts. Without `BELIQ_BASE_URL` the store calls `http://host.docker.internal:3000`, which
+is port 3000 on the Docker host. That default is for a beliq API running on the same
+machine. To run against the public API:
 
-1. **Postgres + Redis** (the `beliq-infra/local` dev stack) and current migrations:
+```bash
+export BELIQ_BASE_URL=https://api.beliq.eu
+export BELIQ_API_KEY=sk_...
+```
 
-   ```bash
-   cd ../../../beliq-infra/local && docker compose -f docker-compose.dev.yml up -d
-   cd ../../beliq-db && yarn db:migrate
-   ```
-
-2. **Engine** on :8000 (build once from `beliq-engine`, run unauthenticated):
-
-   ```bash
-   cd ../../../beliq-engine && docker build -t beliq-engine:smoke .
-   docker run -d --name beliq-engine-smoke -p 8000:8000 -e ALLOW_UNAUTHENTICATED=true beliq-engine:smoke
-   ```
-
-3. **API** on :3000, pointed at the engine and the dev DB:
-
-   ```bash
-   cd ../../../beliq-api && ENGINE_URL=http://localhost:8000 yarn dev
-   ```
-
-4. **An API key valid for the local api.** The api keeps `ALLOW_UNAUTHENTICATED=false`,
-   so mint a key against the dev DB (idempotent demo org) and export it:
-
-   ```bash
-   export BELIQ_API_KEY=sk_...    # a key whose hash (with the api's API_TOKEN_SECRET) is in api_keys
-   ```
+Each case calls `/v1/generate` and `/v1/validate` with that key.
 
 ## Run
 
@@ -67,5 +49,5 @@ take WordPress.org screenshots. Tear everything down with:
 - Green is asserted by re-validating the stored bytes via `/v1/validate`, not by
   trusting the generate 200 (generate already validates internally and 422s on a
   non-green document, so this is defense in depth).
-- This box's host PHP lacks the dom/mbstring extensions PHPUnit needs; the WP
-  container has a complete PHP, which is why the full-path smoke runs there.
+- The full-path smoke runs inside the WordPress container, so it does not depend on the
+  PHP extensions installed on the host.
