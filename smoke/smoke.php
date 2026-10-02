@@ -1,6 +1,6 @@
 <?php
 /**
- * Pass 3 live smoke, run inside the WordPress container via `wp eval-file`.
+ * Live smoke, run inside the WordPress container via `wp eval-file`.
  *
  * For each format case it configures the beliq settings, creates a taxed B2B
  * order, transitions it to the trigger status (firing the real

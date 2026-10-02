@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Pass 3 live smoke driver: brings up WordPress + WooCommerce + the plugin and
+# Live smoke driver: brings up WordPress + WooCommerce + the plugin and
 # runs smoke.php against a local beliq api/engine.
 #
 # Prerequisites (see README.md): the beliq api on :3000 and engine on :8000 are

@@ -1,4 +1,4 @@
-# Local WordPress + WooCommerce stack for the Pass 3 live smoke.
+# Local WordPress + WooCommerce stack for the live smoke.
 #
 # It runs the store; the beliq api (:3000) and engine (:8000) run on the host
 # (see README.md) and are reached from the containers via host.docker.internal.
