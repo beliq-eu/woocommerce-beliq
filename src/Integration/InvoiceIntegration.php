@@ -28,6 +28,9 @@ class InvoiceIntegration extends WC_Integration
         $this->init_form_fields();
         $this->init_settings();
 
+        // WooCommerce fires this hook when the integration's settings are saved.
+        // process_admin_options() returns a bool, which do_action() discards.
+        // @phpstan-ignore return.void
         add_action('woocommerce_update_options_integration_' . $this->id, [$this, 'process_admin_options']);
     }
 

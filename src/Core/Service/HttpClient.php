@@ -10,6 +10,7 @@ namespace Beliq\Core\Service;
 interface HttpClient
 {
     /**
+     * @param non-empty-string $method
      * @param array<string, string> $headers
      * @return array{status: int, body: string, headers: array<string, string>}
      */
