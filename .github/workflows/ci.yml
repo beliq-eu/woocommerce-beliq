@@ -57,6 +57,8 @@ jobs:
         run: composer install --no-interaction --no-progress
       - name: WordPress coding standards (security + i18n)
         run: composer phpcs
+      - name: Static analysis (PHPStan level 8)
+        run: composer phpstan
 
   guard:
     uses: beliq-eu/.github/.github/workflows/guard.yml@e9db7765063f11c1d61258df8bb2119c5d92c961 # main

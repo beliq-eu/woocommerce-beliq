@@ -1,0 +1,15 @@
+# Run by `composer phpstan`, a step of the required phpcs job. WordPress and
+# WooCommerce are not installed here: the WordPress extension brings the
+# WordPress stubs, and scanFiles reads the WooCommerce stubs for symbols only.
+# The plugin's own autoloader is left out on purpose: running it would load
+# InvoiceIntegration, whose parent WC_Integration exists only in a stub.
+includes:
+    - vendor/szepeviktor/phpstan-wordpress/extension.neon
+
+parameters:
+    level: 8
+    paths:
+        - woocommerce-beliq.php
+        - src
+    scanFiles:
+        - vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php

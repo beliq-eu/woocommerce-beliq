@@ -6,6 +6,7 @@ use Beliq\WooCommerce\Config\PluginConfig;
 use WC_Order;
 use WC_Order_Item;
 use WC_Order_Item_Product;
+use WC_Product;
 use WC_Tax;
 
 /**
@@ -120,7 +121,7 @@ final class WcOrderData implements OrderData
             $sku = null;
             if ($item instanceof WC_Order_Item_Product) {
                 $product = $item->get_product();
-                $sku = $product !== false ? $this->emptyToNull($product->get_sku()) : null;
+                $sku = $product instanceof WC_Product ? $this->emptyToNull($product->get_sku()) : null;
             }
 
             yield $this->line($item, (float) $item->get_quantity(), $sku);
@@ -143,13 +144,20 @@ final class WcOrderData implements OrderData
         }
     }
 
+    /**
+     * $item is the WC_Order_Item_Product, WC_Order_Item_Shipping or WC_Order_Item_Fee
+     * that get_items() returns for its type, and each of the three defines
+     * get_total(), get_total_tax() and get_taxes(). The WooCommerce stubs type
+     * get_items() as returning the base class, which defines none of them, so
+     * PHPStan's method.notFound is ignored at the three calls.
+     */
     private function line(WC_Order_Item $item, float $quantity, ?string $sku): WcLineData
     {
         return new WcLineData(
             name: (string) $item->get_name(),
             quantity: $quantity,
-            netTotal: (float) $item->get_total(),
-            taxTotal: (float) $item->get_total_tax(),
+            netTotal: (float) $item->get_total(), // @phpstan-ignore method.notFound
+            taxTotal: (float) $item->get_total_tax(), // @phpstan-ignore method.notFound
             taxRatePercent: $this->ratePercent($item),
             sku: $sku,
         );
@@ -164,7 +172,7 @@ final class WcOrderData implements OrderData
      */
     private function ratePercent(WC_Order_Item $item): ?float
     {
-        $taxes = $item->get_taxes();
+        $taxes = $item->get_taxes(); // @phpstan-ignore method.notFound (see line())
         $totals = is_array($taxes['total'] ?? null) ? $taxes['total'] : [];
 
         $byAmount = [];
@@ -180,9 +188,8 @@ final class WcOrderData implements OrderData
 
         arsort($byAmount);
         $dominantRateId = (int) array_key_first($byAmount);
-        $percent = WC_Tax::get_rate_percent_value($dominantRateId);
 
-        return is_numeric($percent) ? (float) $percent : null;
+        return WC_Tax::get_rate_percent_value($dominantRateId);
     }
 
     private function metaOrNull(string $metaKey): ?string

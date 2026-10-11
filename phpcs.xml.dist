@@ -7,14 +7,13 @@
         which the full WordPress-Core formatting standard is not written for, so
         this ruleset enforces the WordPress sniffs that actually matter for a
         store plugin: output escaping, input sanitization, nonce verification,
-        and text-domain consistency. The framework-agnostic core under src/Core
-        is covered by its own unit tests and excluded here.
+        and text-domain consistency. They read all of the runtime code, the
+        framework-agnostic core under src/Core included.
     </description>
 
     <file>woocommerce-beliq.php</file>
     <file>src</file>
 
-    <exclude-pattern>*/src/Core/*</exclude-pattern>
     <exclude-pattern>*/vendor/*</exclude-pattern>
     <exclude-pattern>*/tests/*</exclude-pattern>
 
