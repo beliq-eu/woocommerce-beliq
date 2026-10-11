@@ -145,11 +145,12 @@ final class WcOrderData implements OrderData
     }
 
     /**
-     * $item is the WC_Order_Item_Product, WC_Order_Item_Shipping or WC_Order_Item_Fee
-     * that get_items() returns for its type, and each of the three defines
-     * get_total(), get_total_tax() and get_taxes(). The WooCommerce stubs type
-     * get_items() as returning the base class, which defines none of them, so
-     * PHPStan's method.notFound is ignored at the three calls.
+     * For the line_item, shipping and fee types, get_items() returns
+     * WC_Order_Item_Product, WC_Order_Item_Shipping and WC_Order_Item_Fee unless a
+     * plugin remaps the class through woocommerce_get_order_item_classname, and
+     * each of the three defines get_total(), get_total_tax() and get_taxes(). The
+     * WooCommerce stubs type get_items() as returning the base class, which defines
+     * none of them, so PHPStan's method.notFound is ignored at the three calls.
      */
     private function line(WC_Order_Item $item, float $quantity, ?string $sku): WcLineData
     {

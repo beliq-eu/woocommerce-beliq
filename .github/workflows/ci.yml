@@ -57,7 +57,7 @@ jobs:
         run: composer install --no-interaction --no-progress
       - name: WordPress coding standards (security + i18n)
         run: composer phpcs
-      - name: Static analysis (PHPStan level 8)
+      - name: Static analysis (PHPStan)
         run: composer phpstan
 
   guard:
