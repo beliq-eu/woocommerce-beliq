@@ -21,7 +21,7 @@ composer require beliq/woocommerce-beliq
 wp plugin activate woocommerce-beliq
 ```
 
-The package requires [`composer/installers`](https://github.com/composer/installers), which puts the plugin in `wp-content/plugins/woocommerce-beliq/`, or wherever the project's `installer-paths` sends `type:wordpress-plugin` (Bedrock uses `web/app/plugins/`). Composer asks once whether to allow the `composer/installers` plugin; allow it, or run `composer config allow-plugins.composer/installers true` first. WooCommerce must be active. The settings are under WooCommerce > Settings > Integration.
+The package requires `composer/installers`, which puts the plugin in `wp-content/plugins/woocommerce-beliq/`, or wherever the project's `installer-paths` sends `type:wordpress-plugin` (Bedrock uses `web/app/plugins/`). Composer asks once whether to allow the `composer/installers` plugin; allow it, or run `composer config allow-plugins.composer/installers true` first. WooCommerce must be active. The settings are under WooCommerce > Settings > Integration.
 
 ## How it works
 
