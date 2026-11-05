@@ -14,7 +14,7 @@
  * Text Domain:          beliq-e-invoicing
  * Domain Path:          /languages
  * WC requires at least: 8.0
- * WC tested up to:      11.1
+ * WC tested up to:      11.2
  */
 
 declare(strict_types=1);
