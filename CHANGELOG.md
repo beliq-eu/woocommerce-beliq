@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1 (2026-11-07)
+
+- The plugin header's `Plugin URI` is https://docs.beliq.eu/integrations/woocommerce/, the plugin's own page. It was https://beliq.eu, the same as `Author URI`, which the WordPress.org submission form refuses.
+
 ## 0.2.0 (2026-11-07)
 
 - An automatic invoice whose first attempt meets a beliq outage is tried again later. The first attempt runs in the status change as before. When beliq cannot be reached or answers that it is unavailable, an Action Scheduler action tries again at about 2, 5, 10, 14, 30 and 60 minutes, or later when beliq's `Retry-After` asks for it. A failure that may have run at beliq (the first attempt's own timeout included) is tried at most 3 times and only within the first 15 minutes, however late the queue runs, and a rejection is not retried. A `Retry-After` beyond the 60-minute slot ends the retries. An outage failure that follows one that may have run still gets the 30 and 60-minute slots, which can cost one more unit if the earlier request was charged and its answer lost. The classes follow the beliq SDKs with two departures, the first attempt's own timeout and TLS failures; see the README's "When beliq is unavailable".
