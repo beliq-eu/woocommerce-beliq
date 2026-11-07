@@ -67,7 +67,9 @@ final class WpHttpClient implements HttpClient
      * until the connection, its TLS handshake included, is up (measured on
      * libcurl 8.14 and 8.22; "Failed to connect ... Timeout was reached" and "SSL
      * connection timeout" are older wordings of the same), and "Operation timed
-     * out" after. Any other wording,
+     * out" after. A libcurl that words a stalled TLS handshake as "Operation timed
+     * out" makes it read as sent, the cautious side: the WP_Error carries no
+     * connect or TLS times to tell the two apart. Any other wording,
      * the fsockopen transport's included, may have come after the send.
      *
      * @return Kind
