@@ -2,7 +2,7 @@
 # This file is distributed under the MIT license.
 msgid ""
 msgstr ""
-"Project-Id-Version: beliq e-invoicing 0.2.0\n"
+"Project-Id-Version: beliq e-invoicing 0.2.1\n"
 "Report-Msgid-Bugs-To: https://beliq.eu\n"
 "Language-Team: beliq <hello@beliq.eu>\n"
 "MIME-Version: 1.0\n"
