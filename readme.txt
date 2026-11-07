@@ -26,7 +26,7 @@ Supported output formats:
 
 Features:
 
-* Automatic generation when an order becomes processing or completed.
+* Automatic generation when an order becomes processing or completed. When beliq cannot be reached or is unavailable, the plugin tries again later, for up to about an hour, and shows each failure on the order.
 * A business-only default: generate only when the buyer looks like a business (VAT ID or company), or widen it to every order.
 * Seller legal details, payment account, and VAT category for zero-rated lines, all configurable.
 * Reads a buyer VAT ID and a buyer reference (for example a Leitweg-ID) from order meta keys you name, so data another plugin stores can flow onto the invoice.
@@ -39,7 +39,7 @@ A beliq API key is required. The free tier is enough to evaluate the plugin.
 
 This plugin connects to the beliq API at https://api.beliq.eu, a third-party service operated by beliq, to generate and validate your e-invoices. The plugin cannot produce a document without it.
 
-When an invoice is generated (automatically when an order reaches the status you configure, or manually from the order screen), the plugin sends that order's invoice data to the beliq API: the seller details you configure, the buyer's billing details and VAT ID, the order line items, and the amounts and taxes. The request is authenticated with your beliq API key. beliq returns the generated document, which the plugin stores with the order. No data is sent to beliq at any other time, and nothing is sent to any other service.
+When an invoice is generated (automatically when an order reaches the status you configure, again later from a scheduled action when that attempt could not reach beliq or beliq was unavailable, or manually from the order screen), the plugin sends that order's invoice data to the beliq API: the seller details you configure, the buyer's billing details and VAT ID, the order line items, and the amounts and taxes. The request is authenticated with your beliq API key. beliq returns the generated document, which the plugin stores with the order. No data is sent to beliq at any other time, and nothing is sent to any other service.
 
 For how beliq handles this data, see the beliq Terms of Service at https://beliq.eu/legal/terms-of-service/ and the Privacy Policy at https://beliq.eu/legal/privacy-policy/.
 
@@ -64,6 +64,12 @@ Yes, you need a beliq API key. The free tier is enough to evaluate the plugin.
 = Which orders get an invoice? =
 
 By default, only orders that look like a business purchase (a VAT ID or a company on the billing details). You can widen this to every order in the settings.
+
+= What happens when beliq is unavailable when an order is paid? =
+
+The order's status change goes through as always. The plugin notes the failure on the order and in the beliq box, and tries again with Action Scheduler at about 2, 5, 10, 14, 30 and 60 minutes after the first attempt, or later when beliq asks for a longer wait. A failure the order's data causes (beliq rejects the invoice) is not retried, since the same data would fail again; it stays on the order next to the "Generate now" button. A request that may have run at beliq (a lost connection, a timeout of the first attempt, or beliq's engine being unavailable) is retried at most three times, and only within the first 15 minutes: beliq does not charge a repeat of a request it charged in the last 15 minutes (with a key of the same mode, up to 10 repeats), and a repeat after that could be charged again. An outage that follows such a failure still gets the later attempts, so in that case one more unit can be charged for an invoice that would otherwise not be made.
+
+Action Scheduler runs from WP-Cron, which runs when the site gets a visit. On a quiet shop a later attempt can run late. A real cron job that calls wp-cron.php, or `wp action-scheduler run`, every minute keeps it on time.
 
 = Where is the document stored? =
 

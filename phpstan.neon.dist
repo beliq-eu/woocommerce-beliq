@@ -1,6 +1,7 @@
 # Run by `composer phpstan`, a step of the required phpcs job. WordPress and
 # WooCommerce are not installed here: the WordPress extension brings the
 # WordPress stubs, and scanFiles reads the WooCommerce stubs for symbols only.
+# The packages stubs carry Action Scheduler, which WooCommerce bundles.
 # The plugin's own autoloader is left out on purpose: running it would load
 # InvoiceIntegration, whose parent WC_Integration exists only in a stub.
 includes:
@@ -13,3 +14,4 @@ parameters:
         - src
     scanFiles:
         - vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
+        - vendor/php-stubs/woocommerce-stubs/woocommerce-packages-stubs.php

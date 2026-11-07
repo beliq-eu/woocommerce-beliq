@@ -2,6 +2,7 @@
 
 namespace Beliq\WooCommerce\Invoice;
 
+use Beliq\WooCommerce\Retry\OrderNotesRecorder;
 use RuntimeException;
 use WC_Order;
 
@@ -53,6 +54,8 @@ final class DocumentStore
         if (isset($meta['schematronVersion']) && $meta['schematronVersion'] !== '') {
             $order->update_meta_data(self::META_SCHEMATRON, $meta['schematronVersion']);
         }
+        // A stored invoice, automatic or by hand, ends what an earlier failure showed.
+        OrderNotesRecorder::clearOn($order);
         $order->save();
 
         return $fileName;

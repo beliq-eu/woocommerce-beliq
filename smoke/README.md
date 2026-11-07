@@ -51,3 +51,19 @@ take WordPress.org screenshots. Tear everything down with:
   non-green document, so this is defense in depth).
 - The full-path smoke runs inside the WordPress container, so it does not depend on the
   PHP extensions installed on the host.
+
+## Retry smoke (no beliq API needed)
+
+```bash
+./run.sh retry
+```
+
+Runs `retry.php`: the later invoice when beliq is unavailable at payment. A stub on the
+host (`stub-router.php`, PHP's built-in server on port 8092, `BELIQ_STUB_PORT` to move it)
+stands in for beliq and answers from a script each case sets. The cases: an outage at
+payment followed by success, run by the Action Scheduler CLI runner and by WP-Cron's
+page-load runner, and with no runner at all; a 422 that is not retried; a runner killed
+mid-call; and two runs at once for one order. Time is not waited out: a case makes the
+next attempt due now and runs the queue. The schedule's real times are covered by the
+unit tests.
+

@@ -1,0 +1,15 @@
+<?php declare(strict_types=1);
+
+namespace Beliq\WooCommerce\Retry;
+
+/** One attempt at an order's automatic beliq invoice. */
+interface InvoiceGeneration
+{
+    /**
+     * Throws the failure when the attempt failed. Returns true when the order
+     * has a beliq invoice after the attempt (stored now, or before it), and false
+     * when it has none and nothing failed: the plugin is off, or the
+     * business-only setting skips the order.
+     */
+    public function generate(int $orderId, bool $laterAttempt): bool;
+}
