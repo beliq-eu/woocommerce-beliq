@@ -4,7 +4,7 @@ A WooCommerce plugin that turns store orders into EN 16931 e-invoices (XRechnung
 
 ## Status
 
-Version 0.1.0 is on Packagist as [`beliq/woocommerce-beliq`](https://packagist.org/packages/beliq/woocommerce-beliq), built from the tag `v0.1.0`. It has no WordPress.org listing yet. What is built:
+Version 0.2.0 is on Packagist as [`beliq/woocommerce-beliq`](https://packagist.org/packages/beliq/woocommerce-beliq), built from the tag `v0.2.0`. It has no WordPress.org listing yet. What is built:
 
 - The plugin boots as a WordPress plugin, declares HPOS compatibility, exposes a settings screen under WooCommerce > Settings > Integration, generates a document when an order reaches the configured status, and stores it for a capability-checked download from the order screen.
 - The live smoke in `smoke/` drives a real WordPress + WooCommerce store through the whole order-to-document path. On 2026-11-05 it passed 38 of 38 checks against the production beliq API on WordPress 7.1.4 and WooCommerce 11.2.2.

@@ -4,7 +4,7 @@ Tags: e-invoicing, xrechnung, zugferd, peppol, factur-x
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 0.1.0
+Stable tag: 0.2.0
 License: MIT
 License URI: https://opensource.org/licenses/MIT
 
@@ -81,6 +81,11 @@ In a protected subdirectory of your WordPress uploads folder. It is served only 
 2. The beliq e-invoice box on the order screen (highlighted), showing the generation status and a capability-checked download.
 
 == Changelog ==
+
+= 0.2.0 =
+* An automatic invoice that fails because beliq is unavailable is tried again later with Action Scheduler, at about 2, 5, 10, 14, 30 and 60 minutes, or later when beliq asks for a longer wait. A rejection is not retried.
+* Every failure of the automatic invoice shows on the order, as an order note and in the beliq box, with the next attempt's time.
+* Two status changes of one order at once make one attempt.
 
 = 0.1.0 =
 * Initial release: order-to-EN 16931 mapping, the beliq API client, the settings screen, automatic generation on the configured order status, manual generate/regenerate, protected download, and HPOS compatibility.
