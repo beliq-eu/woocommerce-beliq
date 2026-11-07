@@ -27,6 +27,7 @@ final class OrderMetaRetryStore implements RetryStore
             (int) ($state['laterAttempts'] ?? 0),
             (int) ($state['countRetries'] ?? 0),
             (int) ($state['nextAttemptAt'] ?? 0),
+            isset($state['notAfter']) ? (int) $state['notAfter'] : null,
         );
     }
 
@@ -49,6 +50,7 @@ final class OrderMetaRetryStore implements RetryStore
             'laterAttempts' => $state->laterAttempts,
             'countRetries' => $state->countRetries,
             'nextAttemptAt' => $state->nextAttemptAt,
+            'notAfter' => $state->notAfter,
         ]));
         if ($lastError === null) {
             $order->delete_meta_data(self::META_LAST_ERROR);

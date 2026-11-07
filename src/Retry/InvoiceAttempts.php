@@ -71,11 +71,12 @@ final class InvoiceAttempts
 
                 return;
             }
-            // The last attempt was claimed but never settled: its process died mid-call.
-            if (RetrySchedule::attemptsExhausted($seen)) {
-                $this->store->delete($orderId);
-                $this->scheduler->unschedule($orderId);
-                $this->recorder->recordFailure($orderId, $this->store->lastError($orderId) ?? 'no answer', $now, null);
+
+            // No attempt is left: the last one was claimed but its process died
+            // mid-call, or a retry of a request that may have run is due inside
+            // the first 15 minutes and its action ran too late to start it there.
+            if (RetrySchedule::attemptsExhausted($seen) || RetrySchedule::expired($seen, $now)) {
+                $this->giveUp($orderId, $now);
 
                 return;
             }
@@ -90,6 +91,14 @@ final class InvoiceAttempts
         }
     }
 
+    private function giveUp(int $orderId, int $now): void
+    {
+        $lastError = $this->store->lastError($orderId) ?? 'no answer';
+        $this->store->delete($orderId);
+        $this->scheduler->unschedule($orderId);
+        $this->recorder->recordFailure($orderId, $lastError, $now, null);
+    }
+
     private function attempt(int $orderId, bool $laterAttempt, RetryState $state): void
     {
         try {
@@ -102,6 +111,11 @@ final class InvoiceAttempts
 
         $this->store->delete($orderId);
         $this->scheduler->unschedule($orderId);
+        // Only a later attempt follows a failure the order shows; a first
+        // attempt that succeeds leaves the order as it is.
+        if (!$laterAttempt) {
+            return;
+        }
         if ($attempted) {
             $this->recorder->clear($orderId);
         } else {

@@ -15,20 +15,11 @@ use Beliq\Core\Service\HttpClient;
  * runs inside the order hook a shop admin is waiting on: against a black-holed
  * host (a mistyped base URL, a host that drops SYNs) libcurl on its own would
  * spend 300 seconds deciding the connect failed.
+ *
+ * @phpstan-import-type Kind from BeliqTransportException
  */
 final class WpHttpClient implements HttpClient
 {
-    // libcurl's error numbers (curl/curl.h). Written out because WordPress may
-    // run on PHP without ext-curl, where the CURLE_* constants are undefined.
-    private const CURLE_COULDNT_RESOLVE_PROXY = 5;
-    private const CURLE_COULDNT_RESOLVE_HOST = 6;
-    private const CURLE_COULDNT_CONNECT = 7;
-    private const CURLE_OPERATION_TIMEDOUT = 28;
-    private const CURLE_SSL_CONNECT_ERROR = 35;
-    private const CURLE_SSL_CERTPROBLEM = 58;
-    private const CURLE_PEER_FAILED_VERIFICATION = 60;
-    private const CURLE_SSL_CACERT_BADFILE = 77;
-
     public function __construct(private readonly int $timeoutSeconds = 30)
     {
     }
@@ -66,12 +57,13 @@ final class WpHttpClient implements HttpClient
 
     /**
      * Where the request stopped, read from the WP_Error message. Requests' cURL
-     * transport words it "cURL error <number>: <libcurl's text>"; for a timeout
-     * (28) libcurl's text says whether the connect or the request ran out. Any
-     * other wording, the fsockopen transport's included, may have come after the
-     * send.
+     * transport words it "cURL error <number>: <libcurl's text>". For a timeout
+     * (28), libcurl's text says "Resolving timed out" or "Connection timed out"
+     * until the connection, its TLS handshake included, is up (measured on
+     * libcurl 8.14 and 8.22), and "Operation timed out" after. Any other wording,
+     * the fsockopen transport's included, may have come after the send.
      *
-     * @return BeliqTransportException::*
+     * @return Kind
      */
     private static function failureKind(string $message): string
     {
@@ -79,14 +71,9 @@ final class WpHttpClient implements HttpClient
             return BeliqTransportException::CONNECTION_LOST;
         }
 
-        return match ((int) $match[1]) {
-            self::CURLE_COULDNT_RESOLVE_PROXY, self::CURLE_COULDNT_RESOLVE_HOST, self::CURLE_COULDNT_CONNECT => BeliqTransportException::CONNECT_FAILED,
-            self::CURLE_OPERATION_TIMEDOUT => preg_match('/^(Resolving|Connection) timed out/', $match[2]) === 1
-                ? BeliqTransportException::CONNECT_TIMEOUT
-                : BeliqTransportException::TIMEOUT,
-            self::CURLE_SSL_CONNECT_ERROR, self::CURLE_SSL_CERTPROBLEM, self::CURLE_PEER_FAILED_VERIFICATION,
-            self::CURLE_SSL_CACERT_BADFILE => BeliqTransportException::TLS,
-            default => BeliqTransportException::CONNECTION_LOST,
-        };
+        return BeliqTransportException::kindForCurlError(
+            (int) $match[1],
+            preg_match('/^(Resolving|Connection) timed out/', $match[2]) !== 1,
+        );
     }
 }

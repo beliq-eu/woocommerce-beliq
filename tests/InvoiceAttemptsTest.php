@@ -101,6 +101,35 @@ final class InvoiceAttemptsTest extends TestCase
         self::assertSame([], $this->retries->pending);
     }
 
+    public function testARetryOfARequestThatMayHaveRunIsDroppedWhenTheQueueRunsTooLate(): void
+    {
+        $this->generation->script = [new BeliqApiException('engine', 'ENGINE_UNAVAILABLE', 503), true];
+
+        $this->attempts()->first(self::ORDER);
+        // WP-Cron did not run for 20 minutes on a quiet shop.
+        $this->now = self::T0 + 1200;
+        foreach ($this->retries->takeDue($this->now) as $orderId) {
+            $this->attempts()->later($orderId);
+        }
+
+        self::assertCount(1, $this->generation->calls);
+        self::assertNull($this->retries->find(self::ORDER));
+        self::assertSame([], $this->retries->pending);
+        $last = $this->recorder->failures[array_key_last($this->recorder->failures)];
+        self::assertSame('ENGINE_UNAVAILABLE (HTTP 503)', $last['description']);
+        self::assertNull($last['nextAttemptAt']);
+    }
+
+    public function testAFirstAttemptThatSucceedsLeavesTheOrderAsItIs(): void
+    {
+        $this->attempts()->first(self::ORDER);
+
+        self::assertSame(1, $this->generation->successes);
+        self::assertSame([], $this->recorder->events);
+        self::assertNull($this->retries->find(self::ORDER));
+        self::assertSame([], $this->retries->pending);
+    }
+
     public function testEngineUnavailableIsRetriedThreeTimesAtMost(): void
     {
         $this->generation->script = [new BeliqApiException('engine', 'ENGINE_UNAVAILABLE', 503)];

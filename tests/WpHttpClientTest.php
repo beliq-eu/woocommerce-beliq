@@ -123,6 +123,8 @@ final class WpHttpClientTest extends TestCase
         yield 'own timeout' => ['cURL error 28: Operation timed out after 30001 milliseconds with 0 bytes received', BeliqTransportException::TIMEOUT];
         yield 'reset after the send' => ['cURL error 56: Recv failure: Connection reset by peer', BeliqTransportException::CONNECTION_LOST];
         yield 'empty reply' => ['cURL error 52: Empty reply from server', BeliqTransportException::CONNECTION_LOST];
+        yield 'stalled TLS handshake' => ['cURL error 28: Connection timed out after 10001 milliseconds', BeliqTransportException::CONNECT_TIMEOUT];
+        yield 'mistyped base URL' => ['cURL error 3: URL rejected: Malformed input to a URL function', BeliqTransportException::CONFIGURATION];
         yield 'certificate' => ['cURL error 60: SSL certificate problem: unable to get local issuer certificate', BeliqTransportException::TLS];
         yield 'handshake' => ['cURL error 35: OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to api.beliq.eu:443', BeliqTransportException::TLS];
         // The fsockopen transport words its failures freely, so where it
