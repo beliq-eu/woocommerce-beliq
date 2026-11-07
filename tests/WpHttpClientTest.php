@@ -125,11 +125,24 @@ final class WpHttpClientTest extends TestCase
         yield 'empty reply' => ['cURL error 52: Empty reply from server', BeliqTransportException::CONNECTION_LOST];
         yield 'stalled TLS handshake' => ['cURL error 28: Connection timed out after 10001 milliseconds', BeliqTransportException::CONNECT_TIMEOUT];
         yield 'mistyped base URL' => ['cURL error 3: URL rejected: Malformed input to a URL function', BeliqTransportException::CONFIGURATION];
+        yield 'older connect-timeout wording' => ['cURL error 28: Failed to connect to api.beliq.eu port 443 after 10001 ms: Timeout was reached', BeliqTransportException::CONNECT_TIMEOUT];
         yield 'certificate' => ['cURL error 60: SSL certificate problem: unable to get local issuer certificate', BeliqTransportException::TLS];
         yield 'handshake' => ['cURL error 35: OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to api.beliq.eu:443', BeliqTransportException::TLS];
         // The fsockopen transport words its failures freely, so where it
         // stopped is unknown: the request may have been sent.
         yield 'another transport' => ['fsockopen(): Unable to connect to api.beliq.eu:443', BeliqTransportException::CONNECTION_LOST];
+    }
+
+    public function testARequestWordPressRefusedToSendIsAConfigurationError(): void
+    {
+        WpHttpStub::$response = new WpErrorStub('User has blocked requests through HTTP.', 'http_request_not_executed');
+
+        try {
+            (new WpHttpClient())->request('GET', 'https://api.beliq.eu/v1/me');
+            self::fail('Expected a transport failure.');
+        } catch (BeliqTransportException $exception) {
+            self::assertSame(BeliqTransportException::CONFIGURATION, $exception->kind);
+        }
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('transportFailures')]

@@ -52,6 +52,7 @@ final class Plugin
                 $configProvider,
                 $generator,
                 new InvoiceGenerator($store, new WpHttpClient(RetrySchedule::LATER_ATTEMPT_TIMEOUT_SECONDS)),
+                $store,
             ),
             new OrderNotesRecorder(),
             log: static function (int $orderId, string $message): void {

@@ -39,6 +39,11 @@ final class WpHttpClient implements HttpClient
         $response = wp_remote_request($url, $args);
         if (is_wp_error($response)) {
             $message = $response->get_error_message();
+            // WordPress refused to send it (WP_HTTP_BLOCK_EXTERNAL, or a filter).
+            if ($response->get_error_code() === 'http_request_not_executed') {
+                // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- the message reaches wc_get_logger() only.
+                throw new BeliqTransportException(BeliqTransportException::CONFIGURATION, 'beliq request not sent: ' . $message);
+            }
             // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- the message reaches wc_get_logger() only; the order shows the failure kind, a fixed string.
             throw new BeliqTransportException(self::failureKind($message), 'beliq request failed: ' . $message);
         }
@@ -60,7 +65,9 @@ final class WpHttpClient implements HttpClient
      * transport words it "cURL error <number>: <libcurl's text>". For a timeout
      * (28), libcurl's text says "Resolving timed out" or "Connection timed out"
      * until the connection, its TLS handshake included, is up (measured on
-     * libcurl 8.14 and 8.22), and "Operation timed out" after. Any other wording,
+     * libcurl 8.14 and 8.22; "Failed to connect ... Timeout was reached" and "SSL
+     * connection timeout" are older wordings of the same), and "Operation timed
+     * out" after. Any other wording,
      * the fsockopen transport's included, may have come after the send.
      *
      * @return Kind
@@ -73,7 +80,7 @@ final class WpHttpClient implements HttpClient
 
         return BeliqTransportException::kindForCurlError(
             (int) $match[1],
-            preg_match('/^(Resolving|Connection) timed out/', $match[2]) !== 1,
+            preg_match('/^(Resolving timed out|Connection timed out|Failed to connect|SSL connection timeout)/', $match[2]) !== 1,
         );
     }
 }

@@ -209,6 +209,22 @@ final class InvoiceAttemptsTest extends TestCase
         self::assertCount(1, $this->generation->calls);
     }
 
+    public function testARunThatFindsTheOrderBusyQueuesItselfAgain(): void
+    {
+        $this->generation->script = [new BeliqApiException('down', 'DATABASE_UNAVAILABLE', 503), true];
+        $this->attempts()->first(self::ORDER);
+
+        // Another process holds the order: its action brought this run, so if
+        // that process dies before it settles, nothing else would be queued.
+        $this->now = self::T0 + 120;
+        $this->retries->takeDue($this->now);
+        self::assertTrue($this->lock->acquire(self::ORDER));
+        $this->attempts()->later(self::ORDER);
+
+        self::assertCount(1, $this->generation->calls);
+        self::assertSame([self::ORDER => self::T0 + 120 + RetrySchedule::ATTEMPT_LEASE_SECONDS], $this->retries->pending);
+    }
+
     public function testAReFiredTriggerWhileARetryIsPendingStartsNoSecondChain(): void
     {
         $this->generation->script = [new BeliqApiException('down', 'DATABASE_UNAVAILABLE', 503), true];

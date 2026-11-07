@@ -23,8 +23,13 @@ final class WpHttpStub
 
 final class WpErrorStub
 {
-    public function __construct(private readonly string $message)
+    public function __construct(private readonly string $message, private readonly string $code = 'http_request_failed')
     {
+    }
+
+    public function get_error_code(): string
+    {
+        return $this->code;
     }
 
     public function get_error_message(): string

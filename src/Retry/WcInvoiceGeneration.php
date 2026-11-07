@@ -3,6 +3,7 @@
 namespace Beliq\WooCommerce\Retry;
 
 use Beliq\WooCommerce\Config\WooPluginConfigProvider;
+use Beliq\WooCommerce\Invoice\DocumentStore;
 use Beliq\WooCommerce\Invoice\InvoiceGenerator;
 use RuntimeException;
 use WC_Order;
@@ -19,6 +20,7 @@ final class WcInvoiceGeneration implements InvoiceGeneration
         private readonly WooPluginConfigProvider $configProvider,
         private readonly InvoiceGenerator $orderRequest,
         private readonly InvoiceGenerator $later,
+        private readonly DocumentStore $store,
     ) {
     }
 
@@ -35,6 +37,7 @@ final class WcInvoiceGeneration implements InvoiceGeneration
 
         ($laterAttempt ? $this->later : $this->orderRequest)->generate($order, $config, force: false);
 
-        return true;
+        // False when the business-only setting skipped the order.
+        return $this->store->has($order);
     }
 }

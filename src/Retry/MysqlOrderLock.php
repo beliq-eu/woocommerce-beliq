@@ -13,8 +13,11 @@ final class MysqlOrderLock implements OrderLock
     {
         global $wpdb;
 
+        // GET_LOCK answers 1 (taken) or 0 (held elsewhere). A database without it
+        // (a WordPress on SQLite, say) answers neither, and the attempt goes ahead
+        // without the lock rather than not at all.
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- a lock is not data, so there is nothing to cache.
-        return $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 0)', self::name($orderId))) === '1';
+        return $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 0)', self::name($orderId))) !== '0';
     }
 
     public function release(int $orderId): void

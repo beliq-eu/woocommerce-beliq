@@ -55,7 +55,13 @@ final class InvoiceAttempts
 
     public function later(int $orderId): void
     {
+        // Another process is attempting the order. Its pending action was the one
+        // that brought this run, so one is queued again, in case that process
+        // dies before it settles; if it settles first, the queued action finds
+        // nothing due and does nothing.
         if (!$this->lock->acquire($orderId)) {
+            $this->scheduler->scheduleAt($orderId, ($this->now)() + RetrySchedule::ATTEMPT_LEASE_SECONDS);
+
             return;
         }
         try {
