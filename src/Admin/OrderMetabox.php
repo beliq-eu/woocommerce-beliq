@@ -3,6 +3,7 @@
 namespace Beliq\WooCommerce\Admin;
 
 use Beliq\WooCommerce\Invoice\DocumentStore;
+use Beliq\WooCommerce\Retry\OrderNotesRecorder;
 use WC_Order;
 use WP_Post;
 
@@ -74,6 +75,28 @@ final class OrderMetabox
                 . esc_html__('Download', 'beliq-e-invoicing') . '</a></p>';
         } else {
             echo '<p>' . esc_html__('No e-invoice has been generated for this order yet.', 'beliq-e-invoicing') . '</p>';
+        }
+
+        $failure = (string) $order->get_meta(OrderNotesRecorder::META_FAILURE);
+        if (!$hasDocument && $failure !== '') {
+            echo '<p><strong>' . esc_html(sprintf(
+                /* translators: %s: the beliq error code or the connection failure */
+                __('The automatic e-invoice failed: %s', 'beliq-e-invoicing'),
+                $failure,
+            )) . '</strong></p>';
+            $failedAt = (string) $order->get_meta(OrderNotesRecorder::META_FAILED_AT);
+            $nextAt = (string) $order->get_meta(OrderNotesRecorder::META_NEXT_ATTEMPT_AT);
+            echo '<p><small>' . esc_html(sprintf(
+                /* translators: %s: failure timestamp */
+                __('Failed %s', 'beliq-e-invoicing'),
+                $failedAt,
+            )) . '<br />' . esc_html($nextAt !== ''
+                ? sprintf(
+                    /* translators: %s: timestamp of the next automatic attempt */
+                    __('Next automatic attempt %s', 'beliq-e-invoicing'),
+                    $nextAt,
+                )
+                : __('No further automatic attempt.', 'beliq-e-invoicing')) . '</small></p>';
         }
 
         echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';

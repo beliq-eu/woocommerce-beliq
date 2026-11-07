@@ -26,10 +26,24 @@ The package requires `composer/installers`, which puts the plugin in `wp-content
 ## How it works
 
 - Settings live in a `WC_Integration` (`src/Integration/InvoiceIntegration.php`); `WooPluginConfigProvider` reads them into the typed `PluginConfig`, coercing WooCommerce's `yes` / `no` checkbox values.
-- `OrderStatusTrigger` fires on `woocommerce_order_status_changed`; when the order reaches the configured status it runs `InvoiceGenerator`, and it never lets a failure break the transition (errors go to the WooCommerce log, source `beliq`).
+- `OrderStatusTrigger` fires on `woocommerce_order_status_changed`; when the order reaches the configured status it hands the order to `InvoiceAttempts`, and it never lets a failure break the transition (errors go to the WooCommerce log, source `beliq`).
+- `InvoiceAttempts` (`src/Retry/`) makes the first attempt in the status change and, when beliq cannot be reached or is unavailable, the later ones from an Action Scheduler action (hook `beliq_retry_invoice`, group `beliq`). See "When beliq is unavailable" below.
 - `WcOrderData` / `WcLineData` wrap a `WC_Order` behind the `OrderData` / `LineData` seam (line net from `get_total()`, rate from `WC_Tax`, buyer VAT and reference from the configured meta keys), so `WooOrderAdapter` maps against plain data.
 - `InvoiceGenerator` maps the order, applies the business-only gate, calls beliq, and hands the bytes to `DocumentStore`, which writes them to a protected uploads subdirectory and records the location in order meta.
 - `OrderMetabox` shows the status and a download button; `OrderActions` serves the capability-checked download and a manual (re)generate, and adds the native WooCommerce order-action entry.
+
+## When beliq is unavailable
+
+An automatic invoice whose first attempt fails is not lost. What is retried, and when, follows the beliq SDKs (`src/Core/Retry/RetrySchedule.php`):
+
+- An outage a wait can outlast is tried at about 2, 5, 10, 14, 30 and 60 minutes after the first attempt, or later when beliq's `Retry-After` asks for longer: a 503 `DATABASE_UNAVAILABLE`, a 502 or 503 without a beliq error code, and a connection that could not be opened.
+- A failure that may have run at beliq is tried at most 3 times, all within the first 15 minutes, a span in which beliq does not charge the same request twice: `ENGINE_UNAVAILABLE` or another coded 502 or 503, a 429 other than `QUOTA_EXCEEDED`, and a connection lost after the request was sent.
+- The first attempt runs in the status change with a 30 s timeout; when that runs out, the later attempts take over with the 90 s of the SDKs. A later attempt's own timeout is final, since beliq may still be working on the document.
+- Nothing else is retried: a 4xx would send the same order data to the same answer.
+
+Each failure goes on the order, as an order note and in the beliq box, with the next attempt's time or "No further automatic attempt". A stored invoice clears it. Each attempt holds a database lock (`GET_LOCK`) for its order and queues the next attempt before it calls beliq, so a process killed mid-call leaves the next attempt in place and two processes never attempt one order at once. The slots and timeouts are beliq's choice, sized from its own outages; no standard sets them.
+
+Action Scheduler runs from WP-Cron, which runs on page loads, so on a quiet shop an attempt can run late. A system cron that calls `wp-cron.php` or `wp action-scheduler run` every minute keeps it on time. A runner killed mid-call leaves its Action Scheduler claim open, and Action Scheduler starts no new batch until it releases that claim (after 5 minutes by default).
 
 ## Development
 
@@ -41,4 +55,4 @@ composer scrub:check    # no em-dash
 composer archive:check  # git archive HEAD (what Packagist ships) = the wp.org distribution + composer.json, README.md, CHANGELOG.md
 ```
 
-The offline suite needs no WordPress: the runtime classes reference WooCommerce symbols only inside method bodies, so the tests that exercise the pure logic (`PluginConfig`, `WooPluginConfigProvider`, the adapter, the mapper, the client) never load them. A live smoke against the beliq API is gated on `BELIQ_API_KEY`.
+The offline suite needs no WordPress: the runtime classes reference WooCommerce symbols only inside method bodies, so the tests that exercise the pure logic (`PluginConfig`, `WooPluginConfigProvider`, the adapter, the mapper, the client) never load them. A live smoke against the beliq API is gated on `BELIQ_API_KEY`; `smoke/run.sh retry` runs the later-invoice cases in a real store against a stub on the host, with no key.

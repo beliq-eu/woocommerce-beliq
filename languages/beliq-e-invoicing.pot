@@ -79,6 +79,10 @@ msgstr ""
 msgid "Factur-X (hybrid PDF)"
 msgstr ""
 
+#. translators: %s: failure timestamp
+msgid "Failed %s"
+msgstr ""
+
 msgid "G - Export outside the EU"
 msgstr ""
 
@@ -119,6 +123,10 @@ msgstr ""
 msgid "Legal name"
 msgstr ""
 
+#. translators: %s: timestamp of the next automatic attempt
+msgid "Next automatic attempt %s"
+msgstr ""
+
 msgid "No beliq e-invoice was generated: this order is outside the configured scope."
 msgstr ""
 
@@ -126,6 +134,9 @@ msgid "No document is stored for this order."
 msgstr ""
 
 msgid "No e-invoice has been generated for this order yet."
+msgstr ""
+
+msgid "No further automatic attempt."
 msgstr ""
 
 msgid "Only generate for business orders"
@@ -191,6 +202,10 @@ msgstr ""
 msgid "The account the buyer pays into. Leave the payment fields empty to omit payment details."
 msgstr ""
 
+#. translators: %s: the beliq error code or the connection failure
+msgid "The automatic e-invoice failed: %s"
+msgstr ""
+
 msgid "The buyer reference (BT-10). Falls back to a customer reference, then the order number, when empty."
 msgstr ""
 
@@ -225,6 +240,14 @@ msgid "ZUGFeRD / Factur-X (hybrid PDF)"
 msgstr ""
 
 msgid "beliq connection"
+msgstr ""
+
+#. translators: 1: the beliq error code or the connection failure, 2: date and time of the next attempt
+msgid "beliq e-invoice failed: %1$s. Next automatic attempt at %2$s."
+msgstr ""
+
+#. translators: %s: the beliq error code or the connection failure
+msgid "beliq e-invoice failed: %s. No further automatic attempt; use \"Generate now\" in the beliq box."
 msgstr ""
 
 msgid "beliq e-invoice"

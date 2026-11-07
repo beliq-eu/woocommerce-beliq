@@ -12,6 +12,7 @@
 #
 # Usage:
 #   BELIQ_API_KEY=... ./run.sh          # up, install, run the smoke (leaves the stack up)
+#   ./run.sh retry                      # the later-invoice smoke against a stub on the host
 #   BELIQ_API_KEY=... BELIQ_BASE_URL=https://api.beliq.eu ./run.sh
 #   ./run.sh down                       # tear the stack down and wipe volumes
 set -euo pipefail
@@ -27,18 +28,34 @@ if [[ "${1:-}" == "down" ]]; then
     exit 0
 fi
 
-: "${BELIQ_API_KEY:?export BELIQ_API_KEY (a key valid for the local api on :3000)}"
-export BELIQ_API_KEY
-export BELIQ_BASE_URL="${BELIQ_BASE_URL:-http://host.docker.internal:3000}"
+MODE="${1:-full}"
+SMOKE_FILE=/smoke/smoke.php
+if [[ "$MODE" == "retry" ]]; then
+    # The retry smoke needs no beliq API: a stub on the host answers from the
+    # script each case sets (stub-router.php).
+    STUB_PORT="${BELIQ_STUB_PORT:-8092}"
+    STUB_DIR="$(mktemp -d)"
+    BELIQ_STUB_DIR="$STUB_DIR" PHP_CLI_SERVER_WORKERS=4 php -S "0.0.0.0:$STUB_PORT" stub-router.php >/dev/null 2>&1 &
+    STUB_PID=$!
+    trap 'kill "$STUB_PID" 2>/dev/null; rm -rf "$STUB_DIR"' EXIT
+    export BELIQ_API_KEY=blq_stub
+    export BELIQ_BASE_URL="http://host.docker.internal:$STUB_PORT"
+    SMOKE_FILE=/smoke/retry.php
+    echo "== Stub beliq API on :$STUB_PORT =="
+else
+    : "${BELIQ_API_KEY:?export BELIQ_API_KEY (a key valid for the local api on :3000)}"
+    export BELIQ_API_KEY
+    export BELIQ_BASE_URL="${BELIQ_BASE_URL:-http://host.docker.internal:3000}"
 
-echo "== Preflight: api reachable =="
-PREFLIGHT_URL="${BELIQ_BASE_URL/host.docker.internal/localhost}/health/live"
-if ! curl -fsS -m 10 "$PREFLIGHT_URL" >/dev/null; then
-    echo "FAIL: beliq api not reachable at $PREFLIGHT_URL" >&2
-    echo "      For the local default, start the engine (:8000) and api (:3000) first (see README.md)." >&2
-    exit 1
+    echo "== Preflight: api reachable =="
+    PREFLIGHT_URL="${BELIQ_BASE_URL/host.docker.internal/localhost}/health/live"
+    if ! curl -fsS -m 10 "$PREFLIGHT_URL" >/dev/null; then
+        echo "FAIL: beliq api not reachable at $PREFLIGHT_URL" >&2
+        echo "      For the local default, start the engine (:8000) and api (:3000) first (see README.md)." >&2
+        exit 1
+    fi
+    echo "  ok ($PREFLIGHT_URL)"
 fi
-echo "  ok ($PREFLIGHT_URL)"
 
 echo "== Bringing up the stack =="
 $DC up -d --wait
@@ -70,9 +87,9 @@ WP option update woocommerce_custom_orders_table_enabled yes >/dev/null
 echo "== Activating the beliq plugin =="
 WP plugin activate woocommerce-beliq
 
-echo "== Running the smoke =="
+echo "== Running the smoke ($SMOKE_FILE) =="
 set +e
-WP eval-file /smoke/smoke.php
+WP eval-file "$SMOKE_FILE"
 code=$?
 set -e
 
