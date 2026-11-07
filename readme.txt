@@ -26,7 +26,7 @@ Supported output formats:
 
 Features:
 
-* Automatic generation when an order becomes processing or completed. When beliq cannot be reached or is unavailable, the plugin tries again later, for about an hour, and shows each failure on the order.
+* Automatic generation when an order becomes processing or completed. When beliq cannot be reached or is unavailable, the plugin tries again later, for up to about an hour, and shows each failure on the order.
 * A business-only default: generate only when the buyer looks like a business (VAT ID or company), or widen it to every order.
 * Seller legal details, payment account, and VAT category for zero-rated lines, all configurable.
 * Reads a buyer VAT ID and a buyer reference (for example a Leitweg-ID) from order meta keys you name, so data another plugin stores can flow onto the invoice.

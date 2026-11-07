@@ -87,7 +87,7 @@ WP option update woocommerce_custom_orders_table_enabled yes >/dev/null
 echo "== Activating the beliq plugin =="
 WP plugin activate woocommerce-beliq
 
-echo "== Running the smoke ($SMOKE_FILE) =="
+echo "== Running the smoke ($SMOKE_FILE) on plugin tree $(git -C .. rev-parse --short HEAD)$(git -C .. diff --quiet HEAD -- || echo ' with uncommitted changes') =="
 set +e
 WP eval-file "$SMOKE_FILE"
 code=$?

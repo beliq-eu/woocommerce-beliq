@@ -139,6 +139,8 @@ function fresh(int $orderId): WC_Order
     return wc_get_order($orderId);
 }
 
+WP_CLI::log(sprintf('WordPress %s, WooCommerce %s', get_bloginfo('version'), WC()->version));
+
 // Store setup, as smoke.php: taxes on, a German seller, XRechnung as XML.
 update_option('woocommerce_calc_taxes', 'yes');
 update_option('woocommerce_prices_include_tax', 'no');
