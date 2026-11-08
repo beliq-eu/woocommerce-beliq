@@ -1,8 +1,12 @@
 # Changelog
 
-## 0.2.1 (2026-11-07)
+## 0.2.2 (2026-11-08)
 
 - The plugin header's `Plugin URI` is https://docs.beliq.eu/integrations/woocommerce/, the plugin's own page. It was https://beliq.eu, the same as `Author URI`, which the WordPress.org submission form refuses.
+
+## 0.2.1 (2026-11-07)
+
+- The tag `v0.2.1` was pushed on the 0.2.0 commit by mistake, and Packagist does not let a published version change its commit. So 0.2.1 holds the 0.2.0 code, and the `Plugin URI` fix meant for it is in 0.2.2.
 
 ## 0.2.0 (2026-11-07)
 
