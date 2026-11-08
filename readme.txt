@@ -4,7 +4,7 @@ Tags: e-invoicing, xrechnung, zugferd, peppol, factur-x
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 0.2.1
+Stable tag: 0.2.2
 License: MIT
 License URI: https://opensource.org/licenses/MIT
 
@@ -82,7 +82,7 @@ In a protected subdirectory of your WordPress uploads folder. It is served only 
 
 == Changelog ==
 
-= 0.2.1 =
+= 0.2.2 =
 * The plugin header's Plugin URI points at the plugin's documentation page instead of the beliq home page, which is the Author URI.
 
 = 0.2.0 =
