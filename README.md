@@ -53,7 +53,6 @@ Action Scheduler runs from WP-Cron, which runs on page loads, so on a quiet shop
 composer test          # PHPUnit (offline: mapper, client, config, provider, adapter)
 composer phpcs          # WordPress security + i18n sniffs over the runtime code, src/Core included
 composer phpstan        # PHPStan at level 8 over the plugin file and src/, against the WordPress and WooCommerce stubs
-composer scrub:check    # no em-dash
 composer archive:check  # git archive HEAD (what Packagist ships) = the wp.org distribution + composer.json, README.md, CHANGELOG.md
 ```
 
