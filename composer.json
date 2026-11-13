@@ -45,7 +45,6 @@
     "test": "phpunit",
     "phpcs": "phpcs -q",
     "phpstan": "phpstan analyse --no-progress --memory-limit=1G",
-    "scrub:check": "bash scripts/scrub-check.sh",
     "archive:check": "bash scripts/archive-check.sh"
   }
 }
