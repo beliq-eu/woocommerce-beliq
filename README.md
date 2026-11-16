@@ -4,15 +4,21 @@ A WooCommerce plugin that turns store orders into EN 16931 e-invoices (XRechnung
 
 ## Status
 
-Version 0.2.2 is on Packagist as [`beliq/woocommerce-beliq`](https://packagist.org/packages/beliq/woocommerce-beliq), built from the tag `v0.2.2`. It has no WordPress.org listing yet. What is built:
+Version 0.2.2 is on Packagist as [`beliq/woocommerce-beliq`](https://packagist.org/packages/beliq/woocommerce-beliq), built from the tag `v0.2.2`, and in the WordPress.org plugin directory as [beliq e-invoicing](https://wordpress.org/plugins/beliq-e-invoicing/) (slug `beliq-e-invoicing`) since 2026-11-15. What is built:
 
 - The plugin boots as a WordPress plugin, declares HPOS compatibility, exposes a settings screen under WooCommerce > Settings > Integration, generates a document when an order reaches the configured status, and stores it for a capability-checked download from the order screen.
 - The live smoke in `smoke/` drives a real WordPress + WooCommerce store through the whole order-to-document path. On 2026-11-05 it passed 38 of 38 checks against the production beliq API on WordPress 7.1.4 and WooCommerce 11.2.2.
 - The official wp.org Plugin Check runs on the distribution in CI (`plugin-check/run.sh --ignore-calendar`, which fails on any error) and weekly with the calendar-driven check included (`.github/workflows/wporg-currency.yml`).
 
-Next is the WordPress.org submission.
-
 ## Install
+
+From the WordPress.org directory: in wp-admin go to Plugins > Add New Plugin, search for "beliq e-invoicing", install and activate it. With WP-CLI:
+
+```
+wp plugin install beliq-e-invoicing --activate
+```
+
+The directory copy lives in `wp-content/plugins/beliq-e-invoicing/` and updates through WordPress.
 
 With Composer, from the directory that holds your WordPress project's `composer.json`:
 
@@ -22,6 +28,8 @@ wp plugin activate woocommerce-beliq
 ```
 
 The package requires `composer/installers`, which puts the plugin in `wp-content/plugins/woocommerce-beliq/`, or wherever the project's `installer-paths` sends `type:wordpress-plugin` (Bedrock uses `web/app/plugins/`). Composer asks once whether to allow the `composer/installers` plugin; allow it, or run `composer config allow-plugins.composer/installers true` first. WooCommerce must be active. The settings are under WooCommerce > Settings > Integration.
+
+The Composer copy and the directory copy sit in different folders, so WordPress lists them as two plugins. To switch, deactivate and delete one before installing the other. The plugin has no uninstall routine, so its settings, order notes and stored invoices stay.
 
 ## How it works
 
