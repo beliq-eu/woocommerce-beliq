@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- The plugin is named "beliq e-invoicing for WooCommerce", so the WordPress.org directory, which lists plugins for every platform, shows which store it is for. The slug `beliq-e-invoicing` and the text domain stay. The readme tag `factur-x` gives its place to `woocommerce`; `zugferd` covers the same format.
+- The readme, the plugin header and the settings screen say that delivery through beliq is in development, next to what the plugin does today: it generates and validates the document and does not send it. Before, they said only that sending stays with the merchant, which read as if beliq would never deliver.
+
 ## 0.2.2 (2026-11-08)
 
 - The plugin header's `Plugin URI` is https://docs.beliq.eu/integrations/woocommerce/, the plugin's own page. It was https://beliq.eu, the same as `Author URI`, which the WordPress.org submission form refuses.

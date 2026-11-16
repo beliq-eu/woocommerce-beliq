@@ -1,6 +1,6 @@
-=== beliq e-invoicing ===
+=== beliq e-invoicing for WooCommerce ===
 Contributors: beliq
-Tags: e-invoicing, xrechnung, zugferd, peppol, factur-x
+Tags: e-invoicing, xrechnung, zugferd, peppol, woocommerce
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 8.2
@@ -8,13 +8,13 @@ Stable tag: 0.2.2
 License: MIT
 License URI: https://opensource.org/licenses/MIT
 
-Generate EN 16931 e-invoices (XRechnung, ZUGFeRD, Factur-X, Peppol BIS) from WooCommerce orders through the beliq API.
+Turn WooCommerce orders into validated EN 16931 e-invoices (XRechnung, ZUGFeRD, Factur-X, Peppol BIS). Delivery through beliq is in development.
 
 == Description ==
 
-beliq e-invoicing turns a WooCommerce order into a structured EN 16931 electronic invoice using the beliq API. When an order reaches the status you choose, the plugin maps the order onto invoice semantics, calls beliq to produce the document, validates it against the business rules, and stores it with the order for download.
+beliq e-invoicing for WooCommerce turns a WooCommerce order into a structured EN 16931 electronic invoice using the beliq API. When an order reaches the status you choose, the plugin maps the order onto invoice semantics, calls beliq to produce the document, validates it against the business rules, and stores it with the order for download.
 
-The plugin generates and validates the document. It does not send, file, transmit, or archive it: Peppol transmission, e-mail delivery, and tax-authority reporting stay with you.
+beliq covers three steps of an e-invoice: generate, validate, and deliver (in development). This plugin runs the first two: it generates and validates the document and stores it with the order. It does not send, file, or archive it. Until delivery through beliq is available, Peppol transmission, e-mail delivery, and tax-authority reporting stay with you.
 
 beliq validates every document against the EN 16931 business rules and the rules of the chosen format before it returns it. That helps you meet e-invoicing obligations, but no plugin can guarantee legal compliance: whether your invoices meet the rules that apply to your business stays your responsibility. The rule sets beliq validates against, with their versions and dates, are listed at https://docs.beliq.eu/compliance/validation-artifacts/.
 
@@ -55,7 +55,7 @@ For how beliq handles this data, see the beliq Terms of Service at https://beliq
 
 = Does this send my invoices to my customers? =
 
-No. The plugin sends the order's invoice data to the beliq API to generate and validate the document (see External services), and stores the returned document with the order. Delivering it to your customer, filing, and archiving stay with you.
+Not yet. Delivery through beliq is in development; https://docs.beliq.eu/compliance/scope/ shows what beliq does today and where delivery fits. For now the plugin sends the order's invoice data to the beliq API to generate and validate the document (see External services), and stores the returned document with the order. Delivering it to your customer, filing, and archiving stay with you.
 
 = Do I need a beliq account? =
 
