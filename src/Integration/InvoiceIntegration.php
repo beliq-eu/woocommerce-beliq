@@ -21,7 +21,7 @@ class InvoiceIntegration extends WC_Integration
         $this->id = 'beliq';
         $this->method_title = __('beliq e-invoicing', 'beliq-e-invoicing');
         $this->method_description = __(
-            'Generate EN 16931 e-invoices (XRechnung, ZUGFeRD, Factur-X, Peppol BIS) from your orders through the beliq API. beliq generates and validates the document; sending, archiving, and filing stay with you.',
+            'Generate EN 16931 e-invoices (XRechnung, ZUGFeRD, Factur-X, Peppol BIS) from your orders through the beliq API. beliq generates and validates the document; delivery through beliq is in development, and until then sending, archiving, and filing stay with you.',
             'beliq-e-invoicing',
         );
 

@@ -48,8 +48,8 @@ on wp.org is the slug. Under the repo's own directory name the text-domain check
 the domain against itself and passes, and the trademark check has nothing to object to.
 Both would be checking the wrong thing.
 
-The slug comes from the plugin's display name ("beliq e-invoicing"), which is what wp.org
-derives it from at submission. It is deliberately not `woocommerce-beliq`: a slug whose
+The slug comes from the plugin's display name at submission ("beliq e-invoicing"), which is what wp.org
+derives it from. The name is "beliq e-invoicing for WooCommerce" since 2026-11-16; a slug never changes. It is deliberately not `woocommerce-beliq`: a slug whose
 first term is `woocommerce` is a Guideline 17 trademark rejection.
 
 ## What `--with-surfaces` adds

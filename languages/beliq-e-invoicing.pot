@@ -89,7 +89,7 @@ msgstr ""
 msgid "Generate beliq e-invoice"
 msgstr ""
 
-msgid "Generate EN 16931 e-invoices (XRechnung, ZUGFeRD, Factur-X, Peppol BIS) from your orders through the beliq API. beliq generates and validates the document; sending, archiving, and filing stay with you."
+msgid "Generate EN 16931 e-invoices (XRechnung, ZUGFeRD, Factur-X, Peppol BIS) from your orders through the beliq API. beliq generates and validates the document; delivery through beliq is in development, and until then sending, archiving, and filing stay with you."
 msgstr ""
 
 msgid "Generate invoices automatically"

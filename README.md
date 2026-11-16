@@ -1,10 +1,10 @@
 # woocommerce-beliq
 
-A WooCommerce plugin that turns store orders into EN 16931 e-invoices (XRechnung, ZUGFeRD, Factur-X, Peppol BIS) through the [beliq](https://beliq.eu) API. It generates and validates the documents; it does not send, file, or submit them anywhere.
+A WooCommerce plugin that turns store orders into EN 16931 e-invoices (XRechnung, ZUGFeRD, Factur-X, Peppol BIS) through the [beliq](https://beliq.eu) API. It generates and validates the documents and does not send them. Delivery through beliq is in development; until it is available, sending, filing, and archiving stay with you.
 
 ## Status
 
-Version 0.2.2 is on Packagist as [`beliq/woocommerce-beliq`](https://packagist.org/packages/beliq/woocommerce-beliq), built from the tag `v0.2.2`, and in the WordPress.org plugin directory as [beliq e-invoicing](https://wordpress.org/plugins/beliq-e-invoicing/) (slug `beliq-e-invoicing`) since 2026-11-15. What is built:
+Version 0.2.2 is on Packagist as [`beliq/woocommerce-beliq`](https://packagist.org/packages/beliq/woocommerce-beliq), built from the tag `v0.2.2`, and in the WordPress.org plugin directory as [beliq e-invoicing for WooCommerce](https://wordpress.org/plugins/beliq-e-invoicing/) (slug `beliq-e-invoicing`) since 2026-11-15. What is built:
 
 - The plugin boots as a WordPress plugin, declares HPOS compatibility, exposes a settings screen under WooCommerce > Settings > Integration, generates a document when an order reaches the configured status, and stores it for a capability-checked download from the order screen.
 - The live smoke in `smoke/` drives a real WordPress + WooCommerce store through the whole order-to-document path. On 2026-11-05 it passed 38 of 38 checks against the production beliq API on WordPress 7.1.4 and WooCommerce 11.2.2.
