@@ -8,12 +8,17 @@ plugin, so this is the gate to clear before uploading a ZIP.
 ```bash
 ./run.sh                   # every check, including the calendar-driven ones
 ./run.sh --ignore-calendar # what the PR gate runs
-./run.sh --with-surfaces   # also install WooCommerce, activate, assert the runtime surfaces
+./run.sh --with-surfaces   # also WooCommerce: runtime checks, surfaces, admin paths, WP_DEBUG
 ./run.sh down              # tear down and wipe the volumes
 ```
 
-Exits non-zero on any Plugin Check ERROR or a failed surface assertion. Nothing here
-needs a beliq API key or a running beliq API. That path is `smoke/`.
+CI runs `--ignore-calendar --with-surfaces`; the weekly workflow runs `--with-surfaces`.
+Exits non-zero on any Plugin Check ERROR or WARNING, a failed surface or admin-path
+assertion, or any line in `wp-content/debug.log`. Nothing here needs a beliq API key or
+a running beliq API. That path is `smoke/`.
+
+Warnings fail too, because the runtime checks report nothing else: a planted 4 MB
+front-end script produced nine warnings and no error. The plugin is at zero of both.
 
 ## The exit code is not wp-cli's
 
@@ -54,7 +59,24 @@ first term is `woocommerce` is a Guideline 17 trademark rejection.
 
 ## What `--with-surfaces` adds
 
-`surfaces.php` asserts the plugin loads and hooks itself in on the WordPress and
+**Plugin Check's runtime checks.** The five performance checks (`enqueued_scripts_size`,
+`enqueued_scripts_scope`, `enqueued_styles_size`, `enqueued_styles_scope`,
+`non_blocking_scripts`) load the site with the plugin active. So WooCommerce is
+installed and the plugin activated before Plugin Check runs, and the run passes
+`--require=<plugin-check>/cli.php`. **`--path` must come after `plugin check`:** Plugin
+Check sets up the runtime checks only when `argv[1]` and `argv[2]` are `plugin` and
+`check`, and with a global flag in front it silently runs the static checks alone. The
+runtime check slugs then do not even exist (`--checks=enqueued_scripts_size` errors).
+
+**`WP_DEBUG`, and a log that must stay empty.** `WP_DEBUG` and `WP_DEBUG_LOG` are on
+(display off) from just before the plugin activates, and the run fails on any line in
+`debug.log`. `admin-paths.php` gives the log something to see. It requests, over HTTP
+and logged in as the admin: the integration's settings screen, the order screen of an
+order whose automatic invoice failed against a refusing API, and "Generate now" with the
+notice it leaves. A planted undefined variable in the metabox left every admin-path
+check green and failed the run on the log alone.
+
+**The surfaces.** `surfaces.php` asserts the plugin loads and hooks itself in on the WordPress and
 WooCommerce the harness just installed: the integration registers, the order-status
 trigger and both admin-post endpoints are bound to **this plugin's** callbacks, HPOS
 compatibility is declared, and the text domain matches the slug. That is what the

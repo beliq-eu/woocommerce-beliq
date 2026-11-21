@@ -6,10 +6,13 @@
 # Usage:
 #   ./run.sh                   # every check, including the calendar-driven ones
 #   ./run.sh --ignore-calendar # what the PR gate runs (see CALENDAR_CODES)
-#   ./run.sh --with-surfaces   # also install WooCommerce, activate, assert the surfaces
+#   ./run.sh --with-surfaces   # also WooCommerce: the runtime checks, the surfaces,
+#                              # the admin paths, and nothing in WP_DEBUG's log
 #   ./run.sh down              # tear the stack down and wipe volumes
 #
-# Exits non-zero on any Plugin Check ERROR, or on a failed surface assertion.
+# Exits non-zero on any Plugin Check ERROR or WARNING, on a failed surface or
+# admin-path assertion, or on any line in wp-content/debug.log. Warnings count
+# because the runtime checks report nothing else, and the plugin is at zero.
 set -euo pipefail
 
 cd "$(dirname "$0")"
@@ -47,7 +50,11 @@ for arg in "$@"; do
 done
 
 DC="docker compose"
-WP() { $DC exec -T wpcli wp --path=/var/www/html "$@"; }
+# --path goes last: Plugin Check sets up its runtime checks only when argv[1]
+# and argv[2] are "plugin" and "check" (CLI_Runner::is_plugin_check), so a
+# global flag in front of the command silently drops them.
+WP() { $DC exec -T wpcli wp "$@" --path=/var/www/html; }
+DEBUG_LOG=/var/www/html/wp-content/debug.log
 
 if [[ "$TEARDOWN" == 1 ]]; then
     $DC down -v
@@ -94,6 +101,26 @@ $DC exec -T -u 0 wpcli sh -c "rm -rf /var/www/html/wp-content/plugins/$SLUG \
     && chown -R 33:33 /var/www/html/wp-content/plugins/$SLUG"
 
 CHECK_ARGS=(--include-experimental)
+
+if [[ "$WITH_SURFACES" == 1 ]]; then
+    # The runtime checks activate the plugin, and its Requires Plugins header
+    # needs WooCommerce, so WooCommerce comes first. They also need cli.php loaded
+    # before WordPress, which is what --require does.
+    echo "== Installing WooCommerce =="
+    WP plugin is-active woocommerce 2>/dev/null || WP plugin install woocommerce --activate
+    echo "  WooCommerce $(WP plugin get woocommerce --field=version)"
+
+    # From here on every notice, warning and deprecation lands in debug.log, and
+    # the run fails on any line in it. The log starts empty just before the
+    # plugin activates, so what WordPress or WooCommerce logged while installing
+    # is not ours.
+    WP config set WP_DEBUG true --raw
+    WP config set WP_DEBUG_LOG true --raw
+    WP config set WP_DEBUG_DISPLAY false --raw
+    $DC exec -T wpcli rm -f "$DEBUG_LOG"
+    WP plugin is-active "$SLUG" 2>/dev/null || WP plugin activate "$SLUG"
+    CHECK_ARGS+=("--require=/var/www/html/wp-content/plugins/plugin-check/cli.php")
+fi
 if [[ -n "$IGNORE_CODES" ]]; then
     CHECK_ARGS+=("--ignore-codes=$IGNORE_CODES")
     echo "== Plugin Check (ignoring: $IGNORE_CODES) =="
@@ -123,9 +150,9 @@ if raw.startswith("["):
     errors = [r for r in rows if r.get("type") == "ERROR"]
     warnings = [r for r in rows if r.get("type") == "WARNING"]
     print(f"  {len(errors)} error(s), {len(warnings)} warning(s)")
-    for r in errors:
-        print(f"  ERROR {r.get('code')}: {r.get('message', '')[:140]}")
-    sys.exit(1 if errors else 0)
+    for r in errors + warnings:
+        print(f"  {r.get('type')} {r.get('code')}: {r.get('message', '')[:140]}")
+    sys.exit(1 if errors or warnings else 0)
 
 if "Checks complete. No errors found." in raw:
     print("  0 errors, 0 warnings")
@@ -137,10 +164,30 @@ sys.exit(1)
 PY
 
 if [[ "$WITH_SURFACES" == 1 ]]; then
-    echo "== Installing WooCommerce =="
-    WP plugin is-active woocommerce 2>/dev/null || WP plugin install woocommerce --activate
-    echo "  WooCommerce $(WP plugin get woocommerce --field=version)"
-    WP plugin is-active "$SLUG" 2>/dev/null || WP plugin activate "$SLUG"
     echo "== Runtime surfaces =="
     WP eval-file /harness/surfaces.php
+
+    # admin-paths.php requests the admin screens from inside the wpcli
+    # container, where the stack's own hostname reaches Apache and localhost
+    # does not. On a fresh install WooCommerce finishes its first run on the
+    # first admin request: it redirects that request to its own screen and turns
+    # on HPOS, after the CLI process has read its options and stored the test
+    # order in wp_posts. So HPOS is set here, and the redirect is cleared.
+    WP option update siteurl http://wordpress >/dev/null
+    WP option update home http://wordpress >/dev/null
+    WP option update woocommerce_feature_custom_order_tables_enabled yes >/dev/null
+    WP option update woocommerce_custom_orders_table_enabled yes >/dev/null
+    WP transient delete _wc_activation_redirect >/dev/null
+    echo "== Admin paths =="
+    paths_ok=1
+    WP eval-file /harness/admin-paths.php || paths_ok=0
+
+    echo "== WP_DEBUG log =="
+    if $DC exec -T wpcli test -s "$DEBUG_LOG"; then
+        echo "  FAIL: $DEBUG_LOG is not empty:" >&2
+        $DC exec -T wpcli head -n 50 "$DEBUG_LOG" >&2
+        exit 1
+    fi
+    echo "  empty"
+    [[ "$paths_ok" == 1 ]] || exit 1
 fi
