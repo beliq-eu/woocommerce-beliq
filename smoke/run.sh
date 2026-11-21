@@ -22,6 +22,7 @@ cd "$(dirname "$0")"
 SITE_URL="http://localhost:8091"
 DC="docker compose"
 WP() { $DC exec -T wpcli wp --path=/var/www/html "$@"; }
+DEBUG_LOG=/var/www/html/wp-content/debug.log
 
 if [[ "${1:-}" == "down" ]]; then
     $DC down -v
@@ -84,6 +85,14 @@ echo "== Enabling HPOS (custom order tables) =="
 WP option update woocommerce_feature_custom_order_tables_enabled yes >/dev/null
 WP option update woocommerce_custom_orders_table_enabled yes >/dev/null
 
+# Every notice, warning and deprecation from here on lands in debug.log, and the
+# smoke fails on any line in it. The log starts empty just before the plugin
+# activates, so what WordPress or WooCommerce logged while installing is not ours.
+WP config set WP_DEBUG true --raw
+WP config set WP_DEBUG_LOG true --raw
+WP config set WP_DEBUG_DISPLAY false --raw
+$DC exec -T wpcli rm -f "$DEBUG_LOG"
+
 echo "== Activating the beliq plugin =="
 WP plugin activate woocommerce-beliq
 
@@ -92,6 +101,15 @@ set +e
 WP eval-file "$SMOKE_FILE"
 code=$?
 set -e
+
+echo "== WP_DEBUG log =="
+if $DC exec -T wpcli test -s "$DEBUG_LOG"; then
+    echo "  FAIL: $DEBUG_LOG is not empty:" >&2
+    $DC exec -T wpcli head -n 50 "$DEBUG_LOG" >&2
+    [[ $code -eq 0 ]] && code=1
+else
+    echo "  empty"
+fi
 
 echo ""
 if [[ $code -eq 0 ]]; then

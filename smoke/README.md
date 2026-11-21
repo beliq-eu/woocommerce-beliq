@@ -15,6 +15,11 @@ and is capability-gated. It also covers the business-only skip and auto-vs-manua
 idempotency. Cases: German XRechnung (xml), French Peppol BIS (xml), German
 ZUGFeRD (hybrid pdf).
 
+`WP_DEBUG` is on from just before the plugin activates, logging to
+`wp-content/debug.log` with display off, and the run fails on any line in that log
+even when every case passed. A notice that changes no outcome is still a defect a
+merchant's log fills up with.
+
 ## Prerequisites: a beliq API and a key for it
 
 `BELIQ_BASE_URL` names the API the store calls, and `BELIQ_API_KEY` is a key that API

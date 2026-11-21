@@ -5,9 +5,10 @@
 # commit ok", never "is today ok", so it needs a schedule of its own.
 #
 # This runs the same plugin-check/run.sh the PR gate runs, without
-# --ignore-calendar, so the two cannot drift apart. A failure here means bump
-# readme.txt (and re-run smoke/ if WooCommerce moved too), not that the code
-# broke. GitHub notifies the account that last touched the cron when a scheduled
+# --ignore-calendar, so the two cannot drift apart. A Plugin Check failure here
+# means bump readme.txt (and re-run smoke/ if WooCommerce moved too), not that
+# the code broke. --with-surfaces also tries the current WooCommerce: a failed
+# surface, admin path or WP_DEBUG line means a release moved under the plugin. GitHub notifies the account that last touched the cron when a scheduled
 # run fails, which is the only thing watching this.
 #
 # Delivery slips: GitHub drops and delays scheduled fires, daily crons by 11 to
@@ -29,4 +30,4 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Plugin Check, including the calendar-driven codes
-        run: ./plugin-check/run.sh
+        run: ./plugin-check/run.sh --with-surfaces
