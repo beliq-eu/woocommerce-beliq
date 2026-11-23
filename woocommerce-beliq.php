@@ -3,7 +3,7 @@
  * Plugin Name:          beliq e-invoicing for WooCommerce
  * Plugin URI:           https://docs.beliq.eu/integrations/woocommerce/
  * Description:          Generate EN 16931 e-invoices (XRechnung, ZUGFeRD, Factur-X, Peppol BIS) from WooCommerce orders through the beliq API. beliq generates and validates the document; delivery through beliq is in development, and until then sending, archiving, and filing stay with you.
- * Version:              0.2.2
+ * Version:              0.2.3
  * Requires at least:    6.5
  * Requires PHP:         8.2
  * Requires Plugins:     woocommerce
