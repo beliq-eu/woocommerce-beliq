@@ -9,7 +9,7 @@ name: beliq-plugin-check
 
 services:
   db:
-    image: mariadb:11
+    image: mariadb:13
     environment:
       MARIADB_DATABASE: wordpress
       MARIADB_USER: wordpress
