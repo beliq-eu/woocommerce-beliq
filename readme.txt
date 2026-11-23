@@ -4,7 +4,7 @@ Tags: e-invoicing, xrechnung, zugferd, peppol, woocommerce
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 0.2.2
+Stable tag: 0.2.3
 License: MIT
 License URI: https://opensource.org/licenses/MIT
 
@@ -81,6 +81,10 @@ In a protected subdirectory of your WordPress uploads folder. It is served only 
 2. The beliq e-invoice box on the order screen (highlighted), showing the generation status and a capability-checked download.
 
 == Changelog ==
+
+= 0.2.3 =
+* An automatic invoice refused because the account reached its extra-document ceiling (DOCUMENT_CEILING_REACHED) is not tried again, the same as a spent monthly quota: no wait clears it before the billing window turns.
+* The plugin header carries the directory name, beliq e-invoicing for WooCommerce, and says that delivery through beliq is in development.
 
 = 0.2.2 =
 * The plugin header's Plugin URI points at the plugin's documentation page instead of the beliq home page, which is the Author URI.
