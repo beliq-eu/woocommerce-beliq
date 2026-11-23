@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- A 429 `DOCUMENT_CEILING_REACHED` is not tried again, the same as `QUOTA_EXCEEDED`. beliq answers it when an account with usage billing reaches its extra-document cap or the ceiling above it, and no wait clears it before the billing window turns, so the three retries only delayed the order note that says why. The beliq SDKs treat it the same way since `@beliq/sdk` 0.7.4 and `beliq` 0.7.2.
 - The plugin is named "beliq e-invoicing for WooCommerce", so the WordPress.org directory, which lists plugins for every platform, shows which store it is for. The slug `beliq-e-invoicing` and the text domain stay. The readme tag `factur-x` gives its place to `woocommerce`; `zugferd` covers the same format.
 - The readme, the plugin header and the settings screen say that delivery through beliq is in development, next to what the plugin does today: it generates and validates the document and does not send it. Before, they said only that sending stays with the merchant, which read as if beliq would never deliver.
 
