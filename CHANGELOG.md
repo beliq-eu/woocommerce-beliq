@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Each amount the plugin sends to beliq is written as its shortest decimal (19.99 as 19.99), whatever the host's `serialize_precision`. Up to 0.2.3, on a host with `serialize_precision` set to 17, PHP's `json_encode` wrote 19.99 into the request as 19.989999999999998. The plugin sets `serialize_precision` to -1 while it encodes the request body and gives the host its own value back after.
+
 ## 0.2.3 (2026-11-23)
 
 - A 429 `DOCUMENT_CEILING_REACHED` is not tried again, the same as `QUOTA_EXCEEDED`. beliq answers it when an account with usage billing reaches its extra-document cap or the ceiling above it, and no wait clears it before the billing window turns, so the three retries only delayed the order note that says why. The beliq SDKs treat it the same way since `@beliq/sdk` 0.7.4 and `beliq` 0.7.2.
