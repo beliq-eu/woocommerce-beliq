@@ -4,7 +4,7 @@ Tags: e-invoicing, xrechnung, zugferd, peppol, woocommerce
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 0.2.3
+Stable tag: 0.2.4
 License: MIT
 License URI: https://opensource.org/licenses/MIT
 
@@ -81,6 +81,9 @@ In a protected subdirectory of your WordPress uploads folder. It is served only 
 2. The beliq e-invoice box on the order screen (highlighted), showing the generation status and a capability-checked download.
 
 == Changelog ==
+
+= 0.2.4 =
+* Each amount the plugin sends to beliq is written as its shortest decimal (19.99 as 19.99), whatever the host's serialize_precision. Up to 0.2.3, on a host with serialize_precision set to 17, 19.99 went into the request as 19.989999999999998.
 
 = 0.2.3 =
 * An automatic invoice refused because the account reached its extra-document ceiling (DOCUMENT_CEILING_REACHED) is not tried again, the same as a spent monthly quota: no wait clears it before the billing window turns.
