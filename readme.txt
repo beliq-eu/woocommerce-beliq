@@ -14,7 +14,7 @@ Turn WooCommerce orders into validated EN 16931 e-invoices (XRechnung, ZUGFeRD, 
 
 beliq e-invoicing for WooCommerce turns a WooCommerce order into a structured EN 16931 electronic invoice using the beliq API. When an order reaches the status you choose, the plugin maps the order onto invoice semantics, calls beliq to produce the document, validates it against the business rules, and stores it with the order for download.
 
-beliq covers three steps of an e-invoice: generate, validate, and deliver (in development). This plugin runs the first two: it generates and validates the document and stores it with the order. It does not send, file, or archive it. Until delivery through beliq is available, Peppol transmission, e-mail delivery, and tax-authority reporting stay with you.
+beliq does five things with an e-invoice: generate, validate, parse, convert and deliver (in development). This plugin runs the first two: it generates and validates the document and stores it with the order. It does not send, file, or archive it. Until delivery through beliq is available, Peppol transmission, e-mail delivery, and tax-authority reporting stay with you.
 
 beliq validates every document against the EN 16931 business rules and the rules of the chosen format before it returns it. That helps you meet e-invoicing obligations, but no plugin can guarantee legal compliance: whether your invoices meet the rules that apply to your business stays your responsibility. The rule sets beliq validates against, with their versions and dates, are listed at https://docs.beliq.eu/compliance/validation-artifacts/.
 
